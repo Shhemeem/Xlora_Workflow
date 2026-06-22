@@ -1,0 +1,2671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorkFlowForge - Saved Works & Pipeline Workspace</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Inter & Noto Fonts for beautiful rendering -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans', sans-serif;
+    }
+    /* Simple smooth transition utilities */
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    /* Clean custom scrollbar for light theme */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex items-center justify-center p-0 sm:p-4 md:p-6 lg:p-8 antialiased">
+
+  <!-- Main Centered App Wrapper Container -->
+  <div class="w-full max-w-7xl bg-white border border-slate-200 rounded-none sm:rounded-3xl shadow-2xl flex flex-col md:flex-row min-h-screen md:min-h-[85vh] lg:min-h-[90vh] overflow-hidden relative">
+
+    <!-- Toast Notification Wrapper -->
+    <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-10 opacity-0 transition-all duration-300 flex items-center gap-3 bg-white border border-slate-200 text-slate-800 py-3.5 px-5 rounded-xl shadow-xl pointer-events-none">
+      <span id="toastColorIndicator" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+      <p id="toastMessage" class="text-sm font-semibold text-slate-700"></p>
+    </div>
+
+    <!-- Delete Confirmation Custom Modal -->
+    <div id="deleteModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-sm overflow-hidden shadow-xl p-6 space-y-4">
+        <div class="flex items-center gap-3 text-rose-600">
+          <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          <h3 class="text-base font-bold text-slate-900">Confirm Action</h3>
+        </div>
+        <p class="text-xs text-slate-500 leading-relaxed" id="deleteModalDescription">Are you sure you want to perform this action? This operation cannot be reversed once confirmed.</p>
+        <div class="flex justify-end gap-3 pt-2">
+          <button id="cancelDeleteBtn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition">Cancel</button>
+          <button id="confirmDeleteBtn" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State Panel -->
+    <div id="loadingOverlay" class="fixed inset-0 z-50 bg-slate-50 flex flex-col items-center justify-center p-6">
+      <div class="relative flex items-center justify-center mb-6">
+        <div class="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-indigo-600"></div>
+        <span class="absolute text-lg">⚡</span>
+      </div>
+      <h1 class="text-xl font-bold text-slate-800">Synchronizing WorkFlowForge Workspace...</h1>
+      <p class="text-xs text-slate-400 mt-2">Connecting to modern live cloud services</p>
+    </div>
+
+    <!-- Authentication Workspace Gateway -->
+    <div id="authOverlay" class="fixed inset-0 z-45 bg-slate-50 hidden items-center justify-center p-6 overflow-y-auto">
+      <div class="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 shadow-xl space-y-6">
+        <div class="text-center space-y-1">
+          <div class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-400 items-center justify-center shadow-md mb-2">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18M3 12h18M12 3l4 4M12 3L8 7M12 21l4-4m-4 4l-4-4" />
+            </svg>
+          </div>
+          <h1 class="text-xl font-black tracking-tight text-slate-900">WorkFlowForge Light</h1>
+          <p class="text-xs text-indigo-600 font-bold uppercase tracking-wider">Secured Workspace Gateway</p>
+        </div>
+
+        <!-- Auth Switch Tabs -->
+        <div class="flex border-b border-slate-100">
+          <button id="tabBtnEmail" class="flex-1 pb-2.5 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 transition">Email Account</button>
+          <button id="tabBtnToken" class="flex-1 pb-2.5 text-xs font-semibold text-slate-400 hover:text-slate-600 transition">Sandbox & Token</button>
+        </div>
+
+        <!-- Tab 1: Email Form -->
+        <div id="authEmailContent" class="space-y-4">
+          <form id="emailLoginForm" class="space-y-3.5">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Email Address</label>
+              <input id="authEmail" type="email" placeholder="you@workspace.com" required class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs py-2 px-3 text-slate-800 outline-none focus:border-indigo-500 transition" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Password</label>
+              <input id="authPassword" type="password" placeholder="••••••••" required class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs py-2 px-3 text-slate-800 outline-none focus:border-indigo-500 transition" />
+            </div>
+            <div class="flex gap-2 pt-1">
+              <button id="btnLoginEmail" type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-xl text-xs font-bold transition">Sign In</button>
+              <button id="btnRegisterEmail" type="button" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 px-4 rounded-xl text-xs font-bold transition">Register</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tab 2: Token / Sandbox Content -->
+        <div id="authTokenContent" class="space-y-4 hidden">
+          <div class="space-y-4">
+            <button id="anonymousLoginBtn" class="w-full bg-slate-900 hover:bg-black text-white py-2.5 px-4 rounded-xl text-xs font-bold shadow-sm transition flex items-center justify-center gap-2">
+              🚀 Quick Anonymous Sandbox
+            </button>
+            
+            <div class="relative flex py-1.5 items-center">
+              <div class="flex-grow border-t border-slate-200"></div>
+              <span class="flex-shrink mx-3 text-[9px] text-slate-400 font-bold uppercase tracking-wider">or sign in with secure token</span>
+              <div class="flex-grow border-t border-slate-200"></div>
+            </div>
+
+            <div class="space-y-2.5">
+              <input id="tokenInput" type="password" placeholder="Paste custom developer token key..." class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs py-2 px-3 text-slate-800 outline-none focus:border-indigo-500 transition" />
+              <button id="tokenLoginBtn" class="w-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 py-2 rounded-xl text-xs font-bold transition">Connect with Token</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- --- SIDEBAR NAVIGATION --- -->
+    <aside class="w-full md:w-80 bg-white border-b md:border-b-0 md:border-r border-slate-200/80 p-6 flex flex-col justify-between shrink-0">
+      <div class="space-y-8">
+        <!-- Logo Header -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-md shadow-indigo-500/10">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18M3 12h18M12 3l4 4M12 3L8 7M12 21l4-4m-4 4l-4-4" />
+            </svg>
+          </div>
+          <div>
+            <h2 class="font-bold text-base leading-tight tracking-tight text-slate-900">WorkFlowForge</h2>
+            <p class="text-[10px] text-indigo-600 font-bold tracking-wider uppercase">Project Pipeline</p>
+          </div>
+        </div>
+
+        <!-- Quick Action CTA Buttons -->
+        <div class="flex gap-2">
+          <button id="openNewWorkBtn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 px-3 rounded-xl text-xs font-semibold transition duration-150 flex items-center justify-center gap-1.5 shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            New Work
+          </button>
+          <button id="openNewPipelineBtn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 px-3.5 rounded-xl text-xs font-semibold transition duration-150 flex items-center justify-center gap-1.5" title="Configure New Pipeline">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Tabs Menu List -->
+        <nav class="space-y-1">
+          <button data-tab="dashboard" class="tab-trigger w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition duration-150 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/70">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+              </svg>
+              <span>Dashboard</span>
+            </div>
+            <span id="dashboardCountBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-bold">0</span>
+          </button>
+
+          <button data-tab="works" class="tab-trigger w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition duration-150 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/70">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 .621-.504 1.125-1.125 1.125H4.875c-.621 0-1.125-.504-1.125-1.125v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8a2.18 2.18 0 00-1.5 3.75M3.75 14.15a2.18 2.18 0 00-.75-1.661V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m-4.5 8a2.18 2.18 0 001.5 3.75m10.5-11.25V5.507c0-1.14-.846-2.122-1.984-2.222a44.29 44.29 0 00-5.532 0C7.354 3.385 6.508 4.367 6.508 5.507V6.5m11 0a48.109 48.109 0 00-11 0m11 0H6.5" />
+              </svg>
+              <span>Saved Works</span>
+            </div>
+          </button>
+
+          <button data-tab="board" class="tab-trigger w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition duration-150 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/70">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.5-3h15m-15-6h15m-15-6h15" />
+              </svg>
+              <span>Kanban Board</span>
+            </div>
+          </button>
+
+          <button data-tab="pipelines" class="tab-trigger w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition duration-150 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/70">
+            <div class="flex items-center gap-3">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-.554-8.243-1.558m16.086 0t-2.53 1.957m-11.026 0l2.53 1.957" />
+              </svg>
+              <span>Templates</span>
+            </div>
+            <span id="pipelineCountBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-bold">0</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- User Section -->
+      <div class="mt-8 pt-6 border-t border-slate-200">
+        <form id="profileForm" class="space-y-4">
+          <div class="flex items-center gap-3">
+            <span id="avatarDisplay" class="text-2xl select-none">🦊</span>
+            <div class="flex-1 min-w-0">
+              <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Current Member</p>
+              <input
+                id="usernameInput"
+                type="text"
+                value="Anonymous Creator"
+                class="bg-transparent border-b border-transparent hover:border-slate-200 focus:border-indigo-500 text-xs font-bold text-slate-800 outline-none w-full py-0.5 transition"
+              />
+            </div>
+            <button type="submit" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-2.5 py-1 rounded-lg font-bold border border-slate-200 transition">
+              Save
+            </button>
+          </div>
+
+          <!-- Custom Avatar Select Grid -->
+          <div class="flex gap-1.5 justify-between bg-slate-50 p-1.5 rounded-xl border border-slate-200/60">
+            <button type="button" data-avatar="🦊" class="avatar-selector text-sm p-1.5 hover:scale-110 transition rounded-lg bg-white border border-slate-200 shadow-sm">🦊</button>
+            <button type="button" data-avatar="🚀" class="avatar-selector text-sm p-1.5 hover:scale-110 transition rounded-lg hover:bg-white">🚀</button>
+            <button type="button" data-avatar="🎨" class="avatar-selector text-sm p-1.5 hover:scale-110 transition rounded-lg hover:bg-white">🎨</button>
+            <button type="button" data-avatar="💻" class="avatar-selector text-sm p-1.5 hover:scale-110 transition rounded-lg hover:bg-white">💻</button>
+            <button type="button" data-avatar="🔮" class="avatar-selector text-sm p-1.5 hover:scale-110 transition rounded-lg hover:bg-white">🔮</button>
+            <button type="button" data-avatar="🍀" class="avatar-selector text-sm p-1.5 hover:scale-110 transition rounded-lg hover:bg-white">🍀</button>
+          </div>
+
+          <!-- Live Sync Session Meta -->
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 space-y-1.5">
+            <div class="flex items-center justify-between text-[10px] font-bold">
+              <span class="flex items-center gap-1.5 text-slate-600">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Sync Active
+              </span>
+              <span id="sessionTypeBadge" class="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded uppercase">Sandbox</span>
+            </div>
+            <p class="text-[10px] text-slate-400 leading-normal overflow-hidden text-ellipsis" id="userPartitionDisplay">Partition Key: loading...</p>
+            <button id="logoutBtn" type="button" class="w-full text-center py-1.5 text-[10px] font-bold text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200 transition">
+              Disconnect / Log Out
+            </button>
+          </div>
+        </form>
+      </div>
+    </aside>
+
+    <!-- --- MAIN VIEW CONTENT --- -->
+    <main class="flex-1 overflow-y-auto px-6 py-8 md:p-10 max-w-7xl mx-auto w-full">
+
+      <!-- --- TAB 1: DASHBOARD --- -->
+      <div id="tab-dashboard" class="tab-content active space-y-8">
+        <!-- Welcome Banner -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 bg-white border border-slate-200 p-6 rounded-2xl shadow-sm relative overflow-hidden">
+          <div class="space-y-1.5 relative z-10">
+            <h1 class="text-xl md:text-2xl font-black text-slate-900">
+              Welcome back, <span id="welcomeUser">Anonymous Creator</span>!
+            </h1>
+            <p class="text-xs text-slate-500 max-w-lg leading-relaxed">
+              Record spec documents, design nested sub-task checklists, link research assets, and track project payments and stages sequentially.
+            </p>
+          </div>
+          <button id="dashNewWorkBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-2.5 px-4 rounded-xl transition duration-150 shadow-md shadow-indigo-600/10 shrink-0 flex items-center gap-2 self-start md:self-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            New Work Project
+          </button>
+        </div>
+
+        <!-- Overview Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Stat 1: Total budget -->
+          <div class="bg-white border border-slate-200 p-5 rounded-2xl flex items-center justify-between shadow-sm">
+            <div class="space-y-1">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Value / Revenue</p>
+              <h3 id="statTotalBudget" class="text-2xl font-black text-slate-800">$0.00</h3>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg font-bold">💰</div>
+          </div>
+          <!-- Stat 2: Paid amount -->
+          <div class="bg-white border border-slate-200 p-5 rounded-2xl flex items-center justify-between shadow-sm">
+            <div class="space-y-1">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Payments Collected</p>
+              <h3 id="statTotalPaid" class="text-2xl font-black text-emerald-600">$0.00</h3>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg font-bold">💵</div>
+          </div>
+          <!-- Stat 3: Unpaid amount -->
+          <div class="bg-white border border-slate-200 p-5 rounded-2xl flex items-center justify-between shadow-sm">
+            <div class="space-y-1">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending Balance</p>
+              <h3 id="statTotalUnpaid" class="text-2xl font-black text-rose-600">$0.00</h3>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg font-bold">💸</div>
+          </div>
+          <!-- Stat 4: Total Works -->
+          <div class="bg-white border border-slate-200 p-5 rounded-2xl flex items-center justify-between shadow-sm">
+            <div class="space-y-1">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Active Works</p>
+              <h3 id="statTotalWorks" class="text-2xl font-black text-slate-800">0</h3>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-slate-50 text-slate-600 flex items-center justify-center text-lg font-bold">💼</div>
+          </div>
+        </div>
+
+        <!-- Dashboard Double Column -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Left: Recently Modified works -->
+          <div class="lg:col-span-7 space-y-4">
+            <div class="flex justify-between items-center">
+              <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                Recently Active Works
+              </h3>
+              <button data-goto-tab="works" class="text-xs text-indigo-600 hover:text-indigo-700 font-bold transition">View All Works &rarr;</button>
+            </div>
+
+            <div id="dashboardRecentList" class="space-y-3">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Right: Active Pipelines -->
+          <div class="lg:col-span-5 space-y-4">
+            <div class="flex justify-between items-center">
+              <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                Your Flow Templates
+              </h3>
+              <button data-goto-tab="pipelines" class="text-xs text-indigo-600 hover:text-indigo-700 font-bold transition">Configure &rarr;</button>
+            </div>
+
+            <div id="dashboardPipelineList" class="space-y-3">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- --- TAB 2: MY SAVED WORKS GRID --- -->
+      <div id="tab-works" class="tab-content space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-xl font-bold text-slate-950">Saved Works Directory</h1>
+            <p class="text-xs text-slate-500">Browse, edit, filter, and track payments and granular sub-tasks for all items.</p>
+          </div>
+          <button id="worksAddNewBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-2.5 px-4 rounded-xl transition shadow-md shadow-indigo-600/10 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Add Work Piece
+          </button>
+        </div>
+
+        <!-- Advanced Filter Row -->
+        <div class="bg-white border border-slate-200 p-4 rounded-xl grid grid-cols-1 md:grid-cols-4 gap-3 shadow-sm">
+          <!-- Search input -->
+          <div class="relative">
+            <input
+              id="workSearchInput"
+              type="text"
+              placeholder="Search title, client, category..."
+              class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg text-xs py-2 px-3 pl-8 text-slate-800 outline-none transition"
+            />
+            <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.603 10.603z" />
+            </svg>
+          </div>
+
+          <!-- Category Dropdown Filter -->
+          <div>
+            <select id="workFilterCategory" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-lg text-xs py-2 px-3 text-slate-700 outline-none transition">
+              <option value="All">All Categories</option>
+            </select>
+          </div>
+
+          <!-- Priority Dropdown Filter -->
+          <div>
+            <select id="workFilterPriority" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-lg text-xs py-2 px-3 text-slate-700 outline-none transition">
+              <option value="All">All Priorities</option>
+              <option value="Critical">Critical Priority</option>
+              <option value="High">High Priority</option>
+              <option value="Medium">Medium Priority</option>
+              <option value="Low">Low Priority</option>
+            </select>
+          </div>
+
+          <!-- Clear Reset button -->
+          <button id="resetFiltersBtn" class="bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-bold text-xs py-2 rounded-lg transition">
+            Reset Directory Filters
+          </button>
+        </div>
+
+        <!-- Directory Grid output -->
+        <div id="worksGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- --- TAB 3: KANBAN BOARD VIEW --- -->
+      <div id="tab-board" class="tab-content space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-xl font-bold text-slate-950">Visual Workflow Board</h1>
+            <p class="text-xs text-slate-500">Track and advance project stages sequentially.</p>
+          </div>
+
+          <!-- Select Active Board Pipeline Template -->
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Active Board:</span>
+            <select id="boardPipelineSelector" class="bg-white border border-slate-200 text-xs py-2 px-3 rounded-xl text-slate-700 outline-none focus:border-indigo-500 transition">
+              <!-- Dynamically populated with template pipelines -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Kanban Column Container -->
+        <div id="kanbanBoardColumns" class="flex flex-col lg:flex-row gap-5 overflow-x-auto pb-4 items-start">
+          <!-- Dynamic column structure populated based on chosen workflow stages -->
+        </div>
+      </div>
+
+      <!-- --- TAB 4: WORKFLOW TEMPLATES --- -->
+      <div id="tab-pipelines" class="tab-content space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-xl font-bold text-slate-950">Lifecycle Pipelines & Templates</h1>
+            <p class="text-xs text-slate-500">Design structural phases that match different project operations.</p>
+          </div>
+          <div class="flex gap-2">
+            <button id="clearAllCustomPipelinesBtn" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-semibold text-xs py-2.5 px-4 rounded-xl transition flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+              Remove Custom Pipelines
+            </button>
+            <button id="pipelinesAddNewBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-2.5 px-4 rounded-xl transition shadow-md shadow-indigo-600/10 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Configure New Pipeline
+            </button>
+          </div>
+        </div>
+
+        <!-- Pipeline Templates Output list -->
+        <div id="pipelinesList" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+    </main>
+
+    <!-- --- WORK DRAWER / DETAILS SLIDE-OVER --- -->
+    <div id="workDetailsDrawer" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex justify-end">
+      <div class="bg-white border-l border-slate-200 w-full max-w-2xl min-h-screen p-6 md:p-8 flex flex-col justify-between shadow-2xl overflow-y-auto">
+        
+        <div class="space-y-6">
+          <!-- Header Controls inside slide-over -->
+          <div class="flex justify-between items-start gap-4">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2 flex-wrap" id="drawerCompletedBadgeWrapper">
+                <!-- Pulsating green tick is dynamically prepended here when project reached completion stage -->
+                <span id="drawerCategoryBadge" class="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-100 text-indigo-700 border border-slate-200">Tag</span>
+                <span id="drawerPriorityBadge" class="text-[9px] font-bold tracking-wider px-2 py-0.5 rounded-full border">Priority</span>
+                <span id="drawerPaymentBadge" class="text-[9px] font-bold tracking-wider px-2 py-0.5 rounded-full border">Payment</span>
+              </div>
+              <h2 id="drawerTitle" class="text-xl font-black text-slate-900 mt-1">Project Spec Title</h2>
+              <div id="drawerClientBox" class="text-xs text-slate-500 font-medium"></div>
+            </div>
+            <button id="closeDrawerBtn" class="text-slate-400 hover:text-slate-600 p-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Dynamic Stepper Journey -->
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">Pipeline Stage Position</p>
+            <div id="drawerStepperContainer" class="grid grid-cols-2 md:grid-cols-4 gap-1.5">
+              <!-- Dynamically populated workflow stage selector buttons -->
+            </div>
+          </div>
+
+          <!-- Project Payment Specs Info -->
+          <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm grid grid-cols-3 gap-4">
+            <div>
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total budget</p>
+              <p id="drawerBudget" class="text-sm font-bold text-slate-700">$0.00</p>
+            </div>
+            <div>
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Amount Paid</p>
+              <p id="drawerAmountPaid" class="text-sm font-bold text-emerald-600">$0.00</p>
+            </div>
+            <div>
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Balance Due</p>
+              <p id="drawerBalance" class="text-sm font-bold text-rose-500">$0.00</p>
+            </div>
+          </div>
+
+          <!-- Spec Objective Description -->
+          <div class="space-y-1">
+            <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Project Objective Summary</h4>
+            <p id="drawerDescDisplay" class="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200 leading-relaxed">Description Summary...</p>
+          </div>
+
+          <!-- Dynamic Subtasks Checklists -->
+          <div class="space-y-3">
+            <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex justify-between items-center">
+              <span>Granular Checklist Tasks</span>
+              <span id="drawerChecklistMetric" class="text-indigo-600">0/0 Complete</span>
+            </h4>
+            
+            <!-- Sub-task addition Form -->
+            <div class="flex gap-2">
+              <input
+                id="newSubtaskInput"
+                type="text"
+                placeholder="Add key step, requirements, asset link..."
+                class="flex-1 bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-lg text-xs py-2 px-3 text-slate-800 outline-none transition"
+              />
+              <button id="addSubtaskBtn" class="bg-slate-800 hover:bg-slate-700 text-white px-3.5 rounded-lg text-xs font-bold border border-slate-700 transition">
+                Add Step
+              </button>
+            </div>
+
+            <!-- Checklist loop -->
+            <div id="drawerSubtaskList" class="space-y-1.5 max-h-[160px] overflow-y-auto">
+              <!-- Dynamically populated checkboxes -->
+            </div>
+          </div>
+
+          <!-- Reference link component -->
+          <div id="drawerReferenceContainer" class="space-y-1 bg-indigo-50/50 p-3 rounded-lg border border-indigo-100 hidden">
+            <h4 class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">Reference Attachment</h4>
+            <div class="flex items-center justify-between gap-4">
+              <a id="drawerReferenceLink" href="#" target="_blank" class="text-xs text-indigo-700 hover:underline font-medium truncate max-w-sm">https://reference.com</a>
+              <button id="copyReferenceUrlBtn" class="text-[10px] bg-white border border-indigo-200 text-indigo-600 font-bold px-2 py-1 rounded hover:bg-indigo-50 transition shrink-0">Copy Link</button>
+            </div>
+          </div>
+
+          <!-- Rich Text Scratchpad area -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rich Scratchpad / Spec Notes</h4>
+              <div id="notesActionGroup" class="flex gap-2">
+                <button id="editNotesBtn" class="text-xs text-indigo-600 hover:text-indigo-700 font-bold transition">Edit Spec Notes</button>
+                <button id="cancelNotesEditBtn" class="text-xs text-slate-500 hover:text-slate-600 font-bold transition hidden">Cancel</button>
+                <button id="saveNotesBtn" class="text-xs text-emerald-600 hover:text-emerald-700 font-bold transition hidden">Save Notes</button>
+              </div>
+            </div>
+
+            <!-- Output view / editable textarea -->
+            <div id="notesDisplayBox" class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 min-h-[100px] text-xs text-slate-600 whitespace-pre-wrap leading-relaxed">Scratchpad notes...</div>
+            <textarea id="notesEditArea" rows="4" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition hidden" placeholder="Enter spec sheets, outlines, code architectures, links, references..."></textarea>
+          </div>
+
+        </div>
+
+        <!-- Drawer footer modification tags -->
+        <div class="border-t border-slate-200 pt-5 mt-8 flex justify-between gap-4">
+          <span id="drawerModificationDate" class="text-[10px] text-slate-400 self-center">Last updated: N/A</span>
+          <div class="flex gap-2">
+            <button id="drawerEditWorkBtn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-4 py-2 rounded-xl text-xs font-bold transition">
+              Edit Details
+            </button>
+            <button id="deleteWorkBtn" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-4 py-2 rounded-xl text-xs font-bold transition">
+              Delete Project Record
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- --- DIALOG MODAL 1: CREATE NEW WORK PROJECT --- -->
+    <div id="newWorkModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-lg overflow-hidden shadow-xl animate-scale-up">
+        <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+          <h3 class="text-sm font-bold text-slate-900">Add Project specs</h3>
+          <button class="close-modal-btn text-slate-400 hover:text-slate-600 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form id="newWorkForm" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Project Title *</label>
+            <input id="newWorkTitle" type="text" required placeholder="e.g. Creative Layout Suite Design" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Description Summary</label>
+            <textarea id="newWorkDesc" placeholder="Provide a clear high-level target objective, specs, details..." rows="3" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition"></textarea>
+          </div>
+
+          <!-- Client Details Fields -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Name</label>
+              <input id="newWorkClientName" type="text" placeholder="e.g. Acme Corp" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Contact (Email/Phone)</label>
+              <input id="newWorkClientContact" type="text" placeholder="e.g. john@acme.com" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Category Tag</label>
+              <input id="newWorkCategory" type="text" placeholder="e.g. Coding, Design, Copy" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Work Urgency / Priority</label>
+              <select id="newWorkPriority" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3 text-slate-700 outline-none transition">
+                <option value="Critical">⚠️ Critical</option>
+                <option value="High">🟠 High Priority</option>
+                <option value="Medium" selected>🔵 Medium Priority</option>
+                <option value="Low">⚪ Low Priority</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- PAYMENT INFO SECTION with Dynamic Advance Field -->
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-3 gap-3">
+            <div class="col-span-3">
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Payment Status</label>
+              <select id="newWorkPaymentStatus" class="w-full bg-white border border-slate-200 focus:border-indigo-500 rounded-lg text-xs py-1.5 px-2 text-slate-700 outline-none transition">
+                <option value="Unpaid">🔴 Unpaid</option>
+                <option value="Advance Paid">🟡 Advance Paid</option>
+                <option value="Fully Paid">🟢 Fully Paid</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Budget ($)</label>
+              <input id="newWorkBudget" type="number" step="0.01" min="0" value="0.00" class="w-full bg-white border border-slate-200 rounded-lg text-xs py-1.5 px-2 text-slate-800 outline-none transition" />
+            </div>
+            
+            <div id="newWorkAmountPaidContainer" class="col-span-2">
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Amount Paid ($)</label>
+              <input id="newWorkAmountPaid" type="number" step="0.01" min="0" value="0.00" class="w-full bg-white border border-slate-200 rounded-lg text-xs py-1.5 px-2 text-slate-800 outline-none transition" />
+            </div>
+
+            <div id="newWorkAdvancePaidContainer" class="col-span-2 hidden">
+              <label class="block text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-1">Advance Amount ($)</label>
+              <input id="newWorkAdvanceAmount" type="number" step="0.01" min="0" value="0.00" class="w-full bg-white border border-amber-200 rounded-lg text-xs py-1.5 px-2 text-slate-800 outline-none focus:border-amber-500 transition" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Assign Status Pipeline</label>
+              <select id="newWorkWorkflowId" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3 text-slate-700 outline-none transition">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Asset Reference URL</label>
+              <input id="newWorkReferenceUrl" type="url" placeholder="https://assets.ref.com" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
+            </div>
+          </div>
+
+          <div class="border-t border-slate-200 pt-5 mt-6 flex justify-end gap-3">
+            <button type="button" class="close-modal-btn bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition">Cancel</button>
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-md transition">Create Work Piece</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- --- DIALOG MODAL 3: EDIT EXISTING WORK PROJECT --- -->
+    <div id="editWorkModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-lg overflow-hidden shadow-xl animate-scale-up">
+        <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+          <h3 class="text-sm font-bold text-slate-900">Edit Project details</h3>
+          <button class="close-modal-btn text-slate-400 hover:text-slate-600 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form id="editWorkForm" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+          <input type="hidden" id="editWorkId" />
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Project Title *</label>
+            <input id="editWorkTitle" type="text" required placeholder="e.g. Creative Layout Suite Design" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Description Summary</label>
+            <textarea id="editWorkDesc" placeholder="Provide a clear high-level target objective, specs, details..." rows="3" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition"></textarea>
+          </div>
+
+          <!-- Client Details Fields (Edit modal) -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Name</label>
+              <input id="editWorkClientName" type="text" placeholder="e.g. Acme Corp" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Contact (Email/Phone)</label>
+              <input id="editWorkClientContact" type="text" placeholder="e.g. john@acme.com" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Category Tag</label>
+              <input id="editWorkCategory" type="text" placeholder="e.g. Coding, Design, Copy" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Work Urgency / Priority</label>
+              <select id="editWorkPriority" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3 text-slate-700 outline-none transition">
+                <option value="Critical">⚠️ Critical</option>
+                <option value="High">🟠 High Priority</option>
+                <option value="Medium">🔵 Medium Priority</option>
+                <option value="Low">⚪ Low Priority</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- PAYMENT INFO SECTION -->
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-3 gap-3">
+            <div class="col-span-3">
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Payment Status</label>
+              <select id="editWorkPaymentStatus" class="w-full bg-white border border-slate-200 focus:border-indigo-500 rounded-lg text-xs py-1.5 px-2 text-slate-700 outline-none transition">
+                <option value="Unpaid">🔴 Unpaid</option>
+                <option value="Advance Paid">🟡 Advance Paid</option>
+                <option value="Fully Paid">🟢 Fully Paid</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Budget ($)</label>
+              <input id="editWorkBudget" type="number" step="0.01" min="0" value="0.00" class="w-full bg-white border border-slate-200 rounded-lg text-xs py-1.5 px-2 text-slate-800 outline-none transition" />
+            </div>
+            
+            <div id="editWorkAmountPaidContainer" class="col-span-2">
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Amount Paid ($)</label>
+              <input id="editWorkAmountPaid" type="number" step="0.01" min="0" value="0.00" class="w-full bg-white border border-slate-200 rounded-lg text-xs py-1.5 px-2 text-slate-800 outline-none transition" />
+            </div>
+
+            <div id="editWorkAdvancePaidContainer" class="col-span-2 hidden">
+              <label class="block text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-1">Advance Amount ($)</label>
+              <input id="editWorkAdvanceAmount" type="number" step="0.01" min="0" value="0.00" class="w-full bg-white border border-amber-200 rounded-lg text-xs py-1.5 px-2 text-slate-800 outline-none focus:border-amber-500 transition" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Assign Status Pipeline</label>
+              <select id="editWorkWorkflowId" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3 text-slate-700 outline-none transition">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Asset Reference URL</label>
+              <input id="editWorkReferenceUrl" type="url" placeholder="https://assets.ref.com" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
+            </div>
+          </div>
+
+          <div class="border-t border-slate-200 pt-5 mt-6 flex justify-end gap-3">
+            <button type="button" class="close-modal-btn bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition">Cancel</button>
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-md transition">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- --- DIALOG MODAL 2: CONFIGURE NEW PIPELINE TEMPLATE --- -->
+    <div id="newPipelineModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-lg overflow-hidden shadow-xl animate-scale-up">
+        <div class="p-6 border-b border-slate-200 flex justify-between items-center">
+          <h3 class="text-sm font-bold text-slate-900">Configure Pipeline Template</h3>
+          <button class="close-modal-btn text-slate-400 hover:text-slate-600 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form id="newPipelineForm" class="p-6 space-y-4">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Pipeline Name</label>
+            <input
+              id="newPipelineName"
+              type="text"
+              required
+              placeholder="e.g. Production Pipeline, Creative Flow..."
+              class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition"
+            />
+          </div>
+
+          <!-- Color Palette Picker -->
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Theme Palette Style</label>
+            <div class="flex gap-2 justify-between">
+              <button type="button" data-color="emerald" class="color-picker-btn capitalize flex-1 text-[10px] py-1.5 px-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition">emerald</button>
+              <button type="button" data-color="blue" class="color-picker-btn capitalize flex-1 text-[10px] py-1.5 px-1 rounded-lg border border-indigo-400 bg-indigo-50 text-indigo-700 font-bold transition">blue</button>
+              <button type="button" data-color="purple" class="color-picker-btn capitalize flex-1 text-[10px] py-1.5 px-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition">purple</button>
+              <button type="button" data-color="rose" class="color-picker-btn capitalize flex-1 text-[10px] py-1.5 px-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition">rose</button>
+              <button type="button" data-color="indigo" class="color-picker-btn capitalize flex-1 text-[10px] py-1.5 px-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition">indigo</button>
+              <button type="button" data-color="amber" class="color-picker-btn capitalize flex-1 text-[10px] py-1.5 px-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition">amber</button>
+            </div>
+          </div>
+
+          <!-- Dynamic Stages Form -->
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Chronological Lifecycle Phases</label>
+            
+            <!-- Stages draft loop preview -->
+            <div id="newPipelineDraftStages" class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5 max-h-[160px] overflow-y-auto mb-3">
+              <!-- Dynamically populated tags with cross delete options -->
+            </div>
+
+            <!-- Add Phase stage field -->
+            <div class="flex gap-2">
+              <input
+                id="newPipelineStageInput"
+                type="text"
+                placeholder="e.g. Audit, Code Verification..."
+                class="flex-1 bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-lg text-xs py-2 px-3 text-slate-800 outline-none transition"
+              />
+              <button id="addStageToDraftBtn" type="button" class="bg-slate-800 hover:bg-slate-700 text-white px-3.5 rounded-lg text-xs font-bold border border-slate-700 transition">
+                Add Phase
+              </button>
+            </div>
+          </div>
+
+          <div class="border-t border-slate-200 pt-5 mt-6 flex justify-end gap-3">
+            <button type="button" class="close-modal-btn bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition">Cancel</button>
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-md transition">Confirm Pipeline Template</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- --- FIREBASE AND WORKSPACE MODULE SCRIPTS --- -->
+  <script type="module">
+    // Suppress asynchronous Firebase Analytics loader failures in sandbox containers
+    window.addEventListener('unhandledrejection', (event) => {
+      if (event.reason && (
+        (event.reason.code && event.reason.code.includes('analytics/')) ||
+        (event.reason.message && event.reason.message.includes('Analytics'))
+      )) {
+        event.preventDefault(); // Prevent page crashes and console boundary errors
+        console.warn("Firebase Analytics suppressed asynchronous load rejection inside preview container:", event.reason.message);
+      }
+    });
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+    import { 
+      getAuth, 
+      signInWithCustomToken, 
+      signInAnonymously, 
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { 
+      getFirestore, 
+      collection, 
+      doc, 
+      getDocs,
+      setDoc, 
+      addDoc, 
+      updateDoc, 
+      deleteDoc, 
+      onSnapshot 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- Global Setup & Fallback Configs (Updated with your custom Firebase keys) ---
+    const defaultFirebaseConfig = {
+      apiKey: "AIzaSyArjOxYP1y0Trpu5FZjtdZiR4lRFoYLhw8",
+      authDomain: "xlora-workflow.firebaseapp.com",
+      projectId: "xlora-workflow",
+      storageBucket: "xlora-workflow.firebasestorage.app",
+      messagingSenderId: "652924950759",
+      appId: "1:652924950759:web:21f2dbce0a1c97a39caa42",
+      measurementId: "G-YGR0XBV55S"
+    };
+
+    const firebaseConfig = typeof __firebase_config !== 'undefined' 
+      ? JSON.parse(__firebase_config) 
+      : defaultFirebaseConfig;
+
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'workflowforge-app';
+
+    // Initialize Firebase Services & Analytics safely
+    const app = initializeApp(firebaseConfig);
+    
+    let analytics;
+    try {
+      analytics = getAnalytics(app);
+    } catch (err) {
+      console.warn("Firebase Analytics initialization skipped safely (usually happens inside sandboxed iframes):", err);
+    }
+
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Initial Default Pipelines Setup - Presets removed as requested
+    const DEFAULT_WORKFLOWS = [];
+
+    // --- UI State Management Engine ---
+    const state = {
+      user: null,
+      customUsername: 'Pioneering User',
+      customAvatar: '🦊',
+      activeTab: 'dashboard',
+      works: [],
+      workflows: [],
+      boardWorkflowFilter: '',
+      searchQuery: '',
+      workFilterCategory: 'All',
+      workFilterPriority: 'All',
+      selectedWorkId: null,
+      isEditingNote: false,
+      
+      // Drafts state
+      draftPipelineStages: ['To Do', 'In Progress', 'Done'],
+      draftPipelineColor: 'blue'
+    };
+
+    // Callback listeners holders
+    let unsubWorkflows = null;
+    let unsubWorks = null;
+
+    // --- DOM Elements Cache ---
+    const dom = {
+      loadingOverlay: document.getElementById('loadingOverlay'),
+      authOverlay: document.getElementById('authOverlay'),
+      profileForm: document.getElementById('profileForm'),
+      logoutBtn: document.getElementById('logoutBtn'),
+      avatarDisplay: document.getElementById('avatarDisplay'),
+      usernameInput: document.getElementById('usernameInput'),
+      welcomeUser: document.getElementById('welcomeUser'),
+      userPartitionDisplay: document.getElementById('userPartitionDisplay'),
+      sessionTypeBadge: document.getElementById('sessionTypeBadge'),
+
+      // Navigation Counts Badges
+      dashboardCountBadge: document.getElementById('dashboardCountBadge'),
+      pipelineCountBadge: document.getElementById('pipelineCountBadge'),
+
+      // Stat cards metrics
+      statTotalWorks: document.getElementById('statTotalWorks'),
+      statTotalSubtasks: document.getElementById('statTotalSubtasks'),
+      statTotalPipelines: document.getElementById('statTotalPipelines'),
+      statCriticalPriority: document.getElementById('statCriticalPriority'),
+      statTotalBudget: document.getElementById('statTotalBudget'),
+      statTotalPaid: document.getElementById('statTotalPaid'),
+      statTotalUnpaid: document.getElementById('statTotalUnpaid'),
+
+      // Dashboard Views Lists
+      dashboardRecentList: document.getElementById('dashboardRecentList'),
+      dashboardPipelineList: document.getElementById('dashboardPipelineList'),
+
+      // Works Directory Filter elements
+      worksGrid: document.getElementById('worksGrid'),
+      workSearchInput: document.getElementById('workSearchInput'),
+      workFilterCategory: document.getElementById('workFilterCategory'),
+      workFilterPriority: document.getElementById('workFilterPriority'),
+      resetFiltersBtn: document.getElementById('resetFiltersBtn'),
+
+      // Kanban board views
+      kanbanBoardColumns: document.getElementById('kanbanBoardColumns'),
+      boardPipelineSelector: document.getElementById('boardPipelineSelector'),
+
+      // Pipeline Customizer
+      pipelinesList: document.getElementById('pipelinesList'),
+      clearAllCustomPipelinesBtn: document.getElementById('clearAllCustomPipelinesBtn'),
+
+      // Dialog Modals elements
+      newWorkModal: document.getElementById('newWorkModal'),
+      newWorkForm: document.getElementById('newWorkForm'),
+      openNewWorkBtn: document.getElementById('openNewWorkBtn'),
+      dashNewWorkBtn: document.getElementById('dashNewWorkBtn'),
+      worksAddNewBtn: document.getElementById('worksAddNewBtn'),
+      newWorkWorkflowId: document.getElementById('newWorkWorkflowId'),
+
+      newPipelineModal: document.getElementById('newPipelineModal'),
+      newPipelineForm: document.getElementById('newPipelineForm'),
+      openNewPipelineBtn: document.getElementById('openNewPipelineBtn'),
+      pipelinesAddNewBtn: document.getElementById('pipelinesAddNewBtn'),
+      newPipelineDraftStages: document.getElementById('newPipelineDraftStages'),
+      newPipelineStageInput: document.getElementById('newPipelineStageInput'),
+      addStageToDraftBtn: document.getElementById('addStageToDraftBtn'),
+
+      // Edit dialog elements
+      editWorkModal: document.getElementById('editWorkModal'),
+      editWorkForm: document.getElementById('editWorkForm'),
+
+      // Slide drawer components
+      workDetailsDrawer: document.getElementById('workDetailsDrawer'),
+      drawerCategoryBadge: document.getElementById('drawerCategoryBadge'),
+      drawerPriorityBadge: document.getElementById('drawerPriorityBadge'),
+      drawerPaymentBadge: document.getElementById('drawerPaymentBadge'),
+      drawerTitle: document.getElementById('drawerTitle'),
+      drawerClientBox: document.getElementById('drawerClientBox'),
+      drawerDescDisplay: document.getElementById('drawerDescDisplay'),
+      drawerStepperContainer: document.getElementById('drawerStepperContainer'),
+      newSubtaskInput: document.getElementById('newSubtaskInput'),
+      addSubtaskBtn: document.getElementById('addSubtaskBtn'),
+      drawerSubtaskList: document.getElementById('drawerSubtaskList'),
+      drawerChecklistMetric: document.getElementById('drawerChecklistMetric'),
+      notesDisplayBox: document.getElementById('notesDisplayBox'),
+      notesEditArea: document.getElementById('notesEditArea'),
+      editNotesBtn: document.getElementById('editNotesBtn'),
+      cancelNotesEditBtn: document.getElementById('cancelNotesEditBtn'),
+      saveNotesBtn: document.getElementById('saveNotesBtn'),
+      drawerModificationDate: document.getElementById('drawerModificationDate'),
+      deleteWorkBtn: document.getElementById('deleteWorkBtn'),
+      drawerEditWorkBtn: document.getElementById('drawerEditWorkBtn'),
+      closeDrawerBtn: document.getElementById('closeDrawerBtn'),
+      drawerReferenceContainer: document.getElementById('drawerReferenceContainer'),
+      drawerReferenceLink: document.getElementById('drawerReferenceLink'),
+      copyReferenceUrlBtn: document.getElementById('copyReferenceUrlBtn'),
+
+      drawerBudget: document.getElementById('drawerBudget'),
+      drawerAmountPaid: document.getElementById('drawerAmountPaid'),
+      drawerBalance: document.getElementById('drawerBalance'),
+
+      // Custom toasts
+      toastNotification: document.getElementById('toastNotification'),
+      toastMessage: document.getElementById('toastMessage'),
+      toastColorIndicator: document.getElementById('toastColorIndicator'),
+
+      // Custom Delete dialog elements
+      deleteModal: document.getElementById('deleteModal'),
+      deleteModalDescription: document.getElementById('deleteModalDescription'),
+      cancelDeleteBtn: document.getElementById('cancelDeleteBtn'),
+      confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
+
+      // Login Gateway switch triggers
+      tabBtnEmail: document.getElementById('tabBtnEmail'),
+      tabBtnToken: document.getElementById('tabBtnToken'),
+      authEmailContent: document.getElementById('authEmailContent'),
+      authTokenContent: document.getElementById('authTokenContent'),
+      emailLoginForm: document.getElementById('emailLoginForm'),
+      btnRegisterEmail: document.getElementById('btnRegisterEmail')
+    };
+
+    // --- Dynamic Payment Advance Visibility Switches ---
+    const setupAdvancePaymentSwitch = (statusSelectId, standardContainerId, advanceContainerId, advanceInputId, standardInputId) => {
+      const selectElem = document.getElementById(statusSelectId);
+      const standardContainer = document.getElementById(standardContainerId);
+      const advanceContainer = document.getElementById(advanceContainerId);
+      const advanceInput = document.getElementById(advanceInputId);
+      const standardInput = document.getElementById(standardInputId);
+
+      selectElem.addEventListener('change', () => {
+        if (selectElem.value === 'Advance Paid') {
+          advanceContainer.classList.remove('hidden');
+          standardContainer.classList.add('hidden');
+          advanceInput.value = standardInput.value; // Sync values initially
+        } else {
+          advanceContainer.classList.add('hidden');
+          standardContainer.classList.remove('hidden');
+          if (selectElem.value === 'Fully Paid') {
+            // Standardize full payment helper
+            const budgetVal = document.getElementById(statusSelectId.replace('PaymentStatus', 'Budget')).value;
+            standardInput.value = budgetVal || "0.00";
+          } else if (selectElem.value === 'Unpaid') {
+            standardInput.value = "0.00";
+          }
+        }
+      });
+    };
+
+    setupAdvancePaymentSwitch('newWorkPaymentStatus', 'newWorkAmountPaidContainer', 'newWorkAdvancePaidContainer', 'newWorkAdvanceAmount', 'newWorkAmountPaid');
+    setupAdvancePaymentSwitch('editWorkPaymentStatus', 'editWorkAmountPaidContainer', 'editWorkAdvancePaidContainer', 'editWorkAdvanceAmount', 'editWorkAmountPaid');
+
+    // --- Custom Confirm Modal Promise Utility ---
+    let pendingDeleteAction = null;
+    const confirmDeleteModal = (description) => {
+      return new Promise((resolve) => {
+        dom.deleteModalDescription.textContent = description;
+        dom.deleteModal.classList.remove('hidden');
+        
+        const clearListeners = () => {
+          dom.confirmDeleteBtn.replaceWith(dom.confirmDeleteBtn.cloneNode(true));
+          dom.cancelDeleteBtn.replaceWith(dom.cancelDeleteBtn.cloneNode(true));
+          // Recache references
+          dom.confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+          dom.cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        };
+
+        dom.confirmDeleteBtn.addEventListener('click', () => {
+          dom.deleteModal.classList.add('hidden');
+          clearListeners();
+          resolve(true);
+        });
+
+        dom.cancelDeleteBtn.addEventListener('click', () => {
+          dom.deleteModal.classList.add('hidden');
+          clearListeners();
+          resolve(false);
+        });
+      });
+    };
+
+    // --- Toast Notifications Helper ---
+    const triggerToast = (message, isError = false) => {
+      dom.toastMessage.textContent = message;
+      dom.toastColorIndicator.className = `w-2.5 h-2.5 rounded-full ${isError ? 'bg-rose-500' : 'bg-emerald-500'}`;
+      
+      dom.toastNotification.classList.remove('translate-y-10', 'opacity-0');
+      dom.toastNotification.classList.add('translate-y-0', 'opacity-100');
+      
+      setTimeout(() => {
+        dom.toastNotification.classList.remove('translate-y-0', 'opacity-100');
+        dom.toastNotification.classList.add('translate-y-10', 'opacity-0');
+      }, 3500);
+    };
+
+    // --- Setup Login UI Tabs toggles ---
+    dom.tabBtnEmail.addEventListener('click', () => {
+      dom.tabBtnEmail.className = "flex-1 pb-2.5 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 transition";
+      dom.tabBtnToken.className = "flex-1 pb-2.5 text-xs font-semibold text-slate-400 hover:text-slate-600 transition";
+      dom.authEmailContent.classList.remove('hidden');
+      dom.authTokenContent.classList.add('hidden');
+    });
+
+    dom.tabBtnToken.addEventListener('click', () => {
+      dom.tabBtnToken.className = "flex-1 pb-2.5 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 transition";
+      dom.tabBtnEmail.className = "flex-1 pb-2.5 text-xs font-semibold text-slate-400 hover:text-slate-600 transition";
+      dom.authTokenContent.classList.remove('hidden');
+      dom.authEmailContent.classList.add('hidden');
+    });
+
+    // Email / Password Login and Register Listeners
+    dom.emailLoginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value.trim();
+      if (!email || !password) return;
+
+      dom.authOverlay.classList.remove('flex');
+      dom.authOverlay.classList.add('hidden');
+      dom.loadingOverlay.classList.remove('hidden');
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        triggerToast("Successfully connected to workspace.");
+      } catch (err) {
+        console.error("Auth sign-in failed: ", err);
+        triggerToast("Login failed. Check your credentials.", true);
+        dom.loadingOverlay.classList.add('hidden');
+        dom.authOverlay.classList.remove('hidden');
+        dom.authOverlay.classList.add('flex');
+      }
+    });
+
+    dom.btnRegisterEmail.addEventListener('click', async () => {
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value.trim();
+      if (!email || password.length < 6) {
+        triggerToast("Provide an email and a password of at least 6 characters.", true);
+        return;
+      }
+
+      dom.authOverlay.classList.remove('flex');
+      dom.authOverlay.classList.add('hidden');
+      dom.loadingOverlay.classList.remove('hidden');
+
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        triggerToast("Registered new pipeline workspace.");
+      } catch (err) {
+        console.error("Auth registration failed: ", err);
+        triggerToast("Registration failed: " + err.message, true);
+        dom.loadingOverlay.classList.add('hidden');
+        dom.authOverlay.classList.remove('hidden');
+        dom.authOverlay.classList.add('flex');
+      }
+    });
+
+    const initWorkspaceAuth = async () => {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          // Fallback trigger prompts
+        }
+      } catch (err) {
+        console.warn("Secure token sign-in rejected. Prompting login interface.", err);
+        dom.loadingOverlay.classList.add('hidden');
+        dom.authOverlay.classList.remove('hidden');
+        dom.authOverlay.classList.add('flex');
+      }
+    };
+
+    document.getElementById('anonymousLoginBtn').addEventListener('click', async () => {
+      dom.authOverlay.classList.remove('flex');
+      dom.authOverlay.classList.add('hidden');
+      dom.loadingOverlay.classList.remove('hidden');
+      try {
+        await signInAnonymously(auth);
+      } catch (err) {
+        console.warn("Live Authentication parameters unavailable. Starting local sandboxed session.");
+        triggerToast("Started local session mode.", true);
+        setupSessionUserData({
+          uid: 'sandboxed-innovator-uid',
+          isAnonymous: true,
+          displayName: 'Local Innovator'
+        });
+      }
+    });
+
+    document.getElementById('tokenLoginBtn').addEventListener('click', async () => {
+      const token = document.getElementById('tokenInput').value.trim();
+      if (!token) {
+        triggerToast("Please provide your token credential keys first.", true);
+        return;
+      }
+      dom.authOverlay.classList.remove('flex');
+      dom.authOverlay.classList.add('hidden');
+      dom.loadingOverlay.classList.remove('hidden');
+      try {
+        await signInWithCustomToken(auth, token);
+        triggerToast("Token synchronization established.");
+      } catch (err) {
+        console.error("Credentials verification failed.", err);
+        triggerToast("Access key expired or invalid.", true);
+        dom.loadingOverlay.classList.add('hidden');
+        dom.authOverlay.classList.remove('hidden');
+        dom.authOverlay.classList.add('flex');
+      }
+    });
+
+    onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        setupSessionUserData(firebaseUser);
+      } else {
+        if (unsubWorkflows) unsubWorkflows();
+        if (unsubWorks) unsubWorks();
+        state.user = null;
+        dom.loadingOverlay.classList.add('hidden');
+        dom.authOverlay.classList.remove('hidden');
+        dom.authOverlay.classList.add('flex');
+      }
+    });
+
+    const setupSessionUserData = (firebaseUser) => {
+      state.user = firebaseUser;
+      
+      const stored = localStorage.getItem(`workflowforge_meta_${firebaseUser.uid}`);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        state.customUsername = parsed.username || 'Anonymous Innovator';
+        state.customAvatar = parsed.avatar || '🦊';
+      } else {
+        state.customUsername = firebaseUser.email || firebaseUser.displayName || 'Pioneering Creator';
+        state.customAvatar = '🦊';
+      }
+
+      dom.usernameInput.value = state.customUsername;
+      dom.welcomeUser.textContent = state.customUsername;
+      dom.avatarDisplay.textContent = state.customAvatar;
+      dom.userPartitionDisplay.textContent = `Partition Key: ${firebaseUser.uid.slice(0, 10)}...`;
+      dom.sessionTypeBadge.textContent = firebaseUser.isAnonymous ? 'Sandbox' : 'Token Sync';
+
+      document.querySelectorAll('.avatar-selector').forEach(btn => {
+        if (btn.dataset.avatar === state.customAvatar) {
+          btn.classList.add('bg-white', 'border-slate-200', 'shadow-sm');
+        } else {
+          btn.classList.remove('bg-white', 'border-slate-200', 'shadow-sm');
+        }
+      });
+
+      syncWorkspaceCollections();
+    };
+
+    dom.profileForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!state.user) return;
+      const val = dom.usernameInput.value.trim();
+      if (!val) return;
+      state.customUsername = val;
+      dom.welcomeUser.textContent = val;
+      localStorage.setItem(`workflowforge_meta_${state.user.uid}`, JSON.stringify({
+        username: state.customUsername,
+        avatar: state.customAvatar
+      }));
+      triggerToast("Your profile updates were recorded.");
+    });
+
+    document.querySelectorAll('.avatar-selector').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.customAvatar = btn.dataset.avatar;
+        dom.avatarDisplay.textContent = state.customAvatar;
+        document.querySelectorAll('.avatar-selector').forEach(item => {
+          item.classList.toggle('bg-white', item.dataset.avatar === state.customAvatar);
+          item.classList.toggle('border-slate-200', item.dataset.avatar === state.customAvatar);
+          item.classList.toggle('shadow-sm', item.dataset.avatar === state.customAvatar);
+        });
+      });
+    });
+
+    dom.logoutBtn.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+      } catch (err) {
+        state.user = null;
+        dom.authOverlay.classList.remove('hidden');
+        dom.authOverlay.classList.add('flex');
+        triggerToast("Cleaned local credentials partition.");
+      }
+    });
+
+    // --- Clean Real-time Firestore Sync Integration (Rule 1, 2, 3) ---
+    const syncWorkspaceCollections = () => {
+      if (!state.user) return;
+
+      if (unsubWorkflows) unsubWorkflows();
+      if (unsubWorks) unsubWorks();
+
+      // 1. Sync pipelines
+      const flowCol = collection(db, 'artifacts', appId, 'users', state.user.uid, 'workflows');
+      unsubWorkflows = onSnapshot(flowCol, (snap) => {
+        const temp = [];
+        snap.forEach(docSnap => {
+          temp.push({ id: docSnap.id, ...docSnap.data() });
+        });
+
+        // Preset templates completely removed. Initial blank template list handles gracefully.
+        state.workflows = temp;
+
+        if (state.workflows.length > 0 && !state.boardWorkflowFilter) {
+          state.boardWorkflowFilter = state.workflows[0].id;
+        }
+
+        updateAppView();
+      }, (err) => {
+        console.warn("Pipelines sync read failed.");
+        state.workflows = [];
+        updateAppView();
+      });
+
+      // 2. Sync works directory
+      const worksCol = collection(db, 'artifacts', appId, 'users', state.user.uid, 'works');
+      unsubWorks = onSnapshot(worksCol, (snap) => {
+        const temp = [];
+        snap.forEach(docSnap => {
+          temp.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        state.works = temp;
+        updateAppView();
+        dom.loadingOverlay.classList.add('hidden');
+      }, (err) => {
+        console.warn("Works partition read failed.");
+        state.works = [];
+        updateAppView();
+        dom.loadingOverlay.classList.add('hidden');
+      });
+    };
+
+    // --- Universal View Updating Engine ---
+    const updateAppView = () => {
+      renderCountBadges();
+      renderDashboardView();
+      renderWorksDirectory();
+      renderKanbanBoard();
+      renderPipelineConfigurator();
+      renderDrawerSpecWindow();
+      populateDropdowns();
+    };
+
+    const renderCountBadges = () => {
+      dom.dashboardCountBadge.textContent = state.works.length;
+      dom.pipelineCountBadge.textContent = state.workflows.length;
+    };
+
+    const populateDropdowns = () => {
+      const oldVal = dom.newWorkWorkflowId.value;
+      if (state.workflows.length === 0) {
+        dom.newWorkWorkflowId.innerHTML = `<option value="">-- Configure a Pipeline First --</option>`;
+      } else {
+        dom.newWorkWorkflowId.innerHTML = state.workflows.map(wf => `
+          <option value="${wf.id}">${wf.name}</option>
+        `).join('');
+      }
+      if (oldVal && state.workflows.some(wf => wf.id === oldVal)) {
+        dom.newWorkWorkflowId.value = oldVal;
+      }
+
+      const editWorkflowSel = document.getElementById('editWorkWorkflowId');
+      if (editWorkflowSel) {
+        if (state.workflows.length === 0) {
+          editWorkflowSel.innerHTML = `<option value="">-- Configure a Pipeline First --</option>`;
+        } else {
+          editWorkflowSel.innerHTML = state.workflows.map(wf => `
+            <option value="${wf.id}">${wf.name}</option>
+          `).join('');
+        }
+      }
+
+      const oldBoardFilter = dom.boardPipelineSelector.value;
+      dom.boardPipelineSelector.innerHTML = state.workflows.map(wf => `
+        <option value="${wf.id}" ${wf.id === state.boardWorkflowFilter ? 'selected' : ''}>${wf.name}</option>
+      `).join('');
+    };
+
+    // --- BADGE STYLE MAPPER ---
+    const getBadgeStyle = (color) => {
+      switch (color) {
+        case 'emerald': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        case 'blue': return 'bg-blue-50 text-blue-700 border-blue-200';
+        case 'purple': return 'bg-purple-50 text-purple-700 border-purple-200';
+        case 'rose': return 'bg-rose-50 text-rose-700 border-rose-200';
+        case 'indigo': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+        case 'amber': return 'bg-amber-50 text-amber-700 border-amber-200';
+        default: return 'bg-slate-100 text-slate-600 border-slate-200';
+      }
+    };
+
+    const getPriorityStyle = (priority) => {
+      switch (priority) {
+        case 'Critical': return 'text-rose-700 bg-rose-50 border-rose-200';
+        case 'High': return 'text-amber-700 bg-amber-50 border-amber-200';
+        case 'Medium': return 'text-blue-700 bg-blue-50 border-blue-200';
+        default: return 'text-slate-600 bg-slate-50 border-slate-200';
+      }
+    };
+
+    const getPaymentStyle = (status) => {
+      switch (status) {
+        case 'Fully Paid': return 'text-emerald-700 bg-emerald-50 border-emerald-200';
+        case 'Advance Paid': return 'text-amber-700 bg-amber-50 border-amber-200';
+        default: return 'text-rose-700 bg-rose-50 border-rose-200';
+      }
+    };
+
+    const formatCurrency = (val) => {
+      const parsed = parseFloat(val);
+      return isNaN(parsed) ? '$0.00' : '$' + parsed.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    };
+
+    // --- HELPER TO CHECK IF PROJECT COMPLETED ITS LIFECYCLE ---
+    const isProjectLifecycleCompleted = (work) => {
+      const matchedWf = state.workflows.find(w => w.id === work.workflowId);
+      if (!matchedWf || !matchedWf.stages || matchedWf.stages.length === 0) return false;
+      const lastStageName = matchedWf.stages[matchedWf.stages.length - 1];
+      return work.currentStage === lastStageName;
+    };
+
+    const getCompletedTickHTML = (work) => {
+      if (isProjectLifecycleCompleted(work)) {
+        return `
+          <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-200 shadow-sm shrink-0">
+            <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" stroke-width="3.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+            </svg>
+            Completed
+          </span>
+        `;
+      }
+      return '';
+    };
+
+    // --- TAB 1: RENDER OVERVIEW DASHBOARD ---
+    const renderDashboardView = () => {
+      let totalBudget = 0;
+      let totalPaid = 0;
+      
+      state.works.forEach(w => {
+        totalBudget += parseFloat(w.totalBudget || 0);
+        totalPaid += parseFloat(w.amountPaid || 0);
+      });
+
+      dom.statTotalBudget.textContent = formatCurrency(totalBudget);
+      dom.statTotalPaid.textContent = formatCurrency(totalPaid);
+      dom.statTotalUnpaid.textContent = formatCurrency(totalBudget - totalPaid);
+      dom.statTotalWorks.textContent = state.works.length;
+
+      if (state.works.length === 0) {
+        dom.dashboardRecentList.innerHTML = `
+          <div class="bg-white border border-slate-200 rounded-xl p-8 text-center text-slate-400 text-xs">
+            No active works mapped in this segment yet. Please configure a template layout and add entries to begin.
+          </div>
+        `;
+      } else {
+        const sorted = [...state.works].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4);
+        dom.dashboardRecentList.innerHTML = sorted.map(work => {
+          const matchedWf = state.workflows.find(w => w.id === work.workflowId);
+          const flowColor = matchedWf ? matchedWf.color : 'indigo';
+          const tasksLength = work.tasks ? work.tasks.length : 0;
+          const finishedTasksLength = work.tasks ? work.tasks.filter(t => t.done).length : 0;
+          
+          const budgetText = formatCurrency(work.totalBudget || 0);
+          const paidText = formatCurrency(work.amountPaid || 0);
+
+          const clientMarkup = work.clientName ? `<p class="text-[10px] text-slate-500 font-medium">Client: ${work.clientName}</p>` : '';
+          const completionTick = isProjectLifecycleCompleted(work) ? `
+            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-sm" title="Project Complete">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+              </svg>
+            </span>
+          ` : '';
+
+          return `
+            <div data-id="${work.id}" class="recent-work-card bg-white border border-slate-200 hover:border-slate-300 p-4 rounded-xl shadow-sm hover:shadow transition duration-150 cursor-pointer flex items-start gap-4 relative group">
+              <div class="w-9 h-9 rounded-lg shrink-0 flex items-center justify-center text-xs font-bold border ${getBadgeStyle(flowColor)}">
+                ${(work.category || 'GEN').slice(0, 2).toUpperCase()}
+              </div>
+              <div class="flex-1 min-w-0 space-y-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h4 class="text-xs font-bold text-slate-900 truncate pr-16">${work.title}</h4>
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded border ${getPriorityStyle(work.priority)}">${work.priority}</span>
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded border ${getPaymentStyle(work.paymentStatus || 'Unpaid')}">${work.paymentStatus || 'Unpaid'}</span>
+                  ${getCompletedTickHTML(work)}
+                </div>
+                ${clientMarkup}
+                <p class="text-[11px] text-slate-400 line-clamp-1">${work.description || 'No Spec objective defined.'}</p>
+                <div class="flex items-center gap-2 text-[10px] text-slate-500 pt-1 flex-wrap">
+                  <span class="font-medium text-slate-700">Stage:</span>
+                  <span class="bg-slate-100 text-slate-800 font-bold px-1.5 py-0.5 rounded border border-slate-200">${work.currentStage}</span>
+                  <span class="text-slate-300">&bull;</span>
+                  <span class="font-semibold text-slate-600">Value: ${budgetText} (${paidText} Paid)</span>
+                  <span class="text-slate-300">&bull;</span>
+                  <span>${finishedTasksLength}/${work.tasks ? work.tasks.length : 0} milestones</span>
+                </div>
+              </div>
+              <div class="absolute right-4 top-4 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                <button data-id="${work.id}" class="btn-inline-edit p-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 rounded transition" title="Edit Entry">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                </button>
+                <button data-id="${work.id}" class="btn-inline-delete p-1 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded transition" title="Delete Entry">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.109 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                </button>
+              </div>
+              <div class="absolute right-4 top-4 pointer-events-none group-hover:opacity-0 transition-opacity duration-150">
+                ${completionTick}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        document.querySelectorAll('.recent-work-card').forEach(card => {
+          card.addEventListener('click', (e) => {
+            if (e.target.closest('.btn-inline-edit') || e.target.closest('.btn-inline-delete')) return;
+            state.selectedWorkId = card.dataset.id;
+            dom.workDetailsDrawer.classList.remove('hidden');
+            updateAppView();
+          });
+        });
+
+        attachInlineActionListeners();
+      }
+
+      if (state.workflows.length === 0) {
+        dom.dashboardPipelineList.innerHTML = `
+          <div class="bg-white border border-slate-200 rounded-xl p-6 text-center text-slate-400 text-xs">
+            No pipeline models configured. Head to templates to define active chronological lifecycle structures.
+          </div>
+        `;
+      } else {
+        dom.dashboardPipelineList.innerHTML = state.workflows.map(wf => {
+          const stepsCount = wf.stages ? wf.stages.length : 0;
+          return `
+            <div class="pipeline-template-badge bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex flex-col gap-2">
+              <div class="flex justify-between items-center">
+                <h4 class="text-xs font-bold text-slate-800">${wf.name}</h4>
+                <span class="text-[9px] font-bold px-2 py-0.5 rounded border capitalize ${getBadgeStyle(wf.color)}">${wf.color} style</span>
+              </div>
+              <div class="flex flex-wrap gap-1 items-center">
+                ${wf.stages.map((stg, sIndex) => `
+                  <span class="text-[9px] bg-slate-50 text-slate-500 px-2 py-0.5 rounded border border-slate-100 flex items-center gap-1">
+                    ${sIndex === stepsCount - 1 ? '<span class="text-emerald-500">✔</span>' : ''} ${stg}
+                  </span>
+                  ${sIndex < stepsCount - 1 ? '<span class="text-slate-300 text-[10px]">&rarr;</span>' : ''}
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    };
+
+    // --- TAB 2: MY SAVED WORKS DIRECTORY GRID ---
+    const renderWorksDirectory = () => {
+      const categoriesSet = new Set(state.works.map(w => w.category).filter(Boolean));
+      const activeCatFilter = dom.workFilterCategory.value;
+      
+      dom.workFilterCategory.innerHTML = '<option value="All">All Categories</option>' + 
+        Array.from(categoriesSet).map(c => `<option value="${c}" ${c === activeCatFilter ? 'selected' : ''}>${c}</option>`).join('');
+
+      const searchQueryVal = dom.workSearchInput.value.toLowerCase().trim();
+      const categoryFilterVal = dom.workFilterCategory.value;
+      const priorityFilterVal = dom.workFilterPriority.value;
+
+      const filtered = state.works.filter(work => {
+        const matchesSearch = work.title.toLowerCase().includes(searchQueryVal) || 
+                              (work.description && work.description.toLowerCase().includes(searchQueryVal)) ||
+                              (work.category && work.category.toLowerCase().includes(searchQueryVal)) ||
+                              (work.clientName && work.clientName.toLowerCase().includes(searchQueryVal));
+        const matchesCategory = categoryFilterVal === 'All' || work.category === categoryFilterVal;
+        const matchesPriority = priorityFilterVal === 'All' || work.priority === priorityFilterVal;
+
+        return matchesSearch && matchesCategory && matchesPriority;
+      });
+
+      if (filtered.length === 0) {
+        dom.worksGrid.innerHTML = `
+          <div class="col-span-full bg-white border border-slate-200 rounded-2xl p-16 text-center text-slate-400">
+            <span class="text-3xl block mb-3">📁</span>
+            <p class="text-sm font-semibold mb-1 text-slate-700">No directory matches found</p>
+            <p class="text-xs max-w-sm mx-auto">Try lowering filters, clearing your active search keyword, or adding dynamic project records.</p>
+          </div>
+        `;
+        return;
+      }
+
+      dom.worksGrid.innerHTML = filtered.map(work => {
+        const matchedWf = state.workflows.find(w => w.id === work.workflowId);
+        const flowColor = matchedWf ? matchedWf.color : 'indigo';
+        const tasksLength = work.tasks ? work.tasks.length : 0;
+        const finishedTasksLength = work.tasks ? work.tasks.filter(t => t.done).length : 0;
+        const percent = tasksLength > 0 ? Math.round((finishedTasksLength / tasksLength) * 100) : 0;
+
+        const sidebarHighlightClass = getBadgeStyle(flowColor).split(' ')[0];
+        const budgetText = formatCurrency(work.totalBudget || 0);
+        const paidText = formatCurrency(work.amountPaid || 0);
+
+        const clientMarkup = work.clientName ? `
+          <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 mt-2 text-[10px] text-slate-600 flex justify-between items-center">
+            <span class="font-medium text-slate-500">Client:</span>
+            <span class="font-bold text-slate-700 truncate max-w-[120px]">${work.clientName}</span>
+          </div>
+        ` : '';
+
+        return `
+          <div data-id="${work.id}" class="work-directory-card bg-white border border-slate-200 hover:border-slate-300 p-5 rounded-2xl transition duration-150 cursor-pointer flex flex-col justify-between shadow-sm relative overflow-hidden group">
+            <span class="absolute top-0 bottom-0 left-0 w-1 ${sidebarHighlightClass}"></span>
+
+            <div class="space-y-3.5">
+              <div class="flex justify-between items-start gap-2">
+                <div class="flex gap-1.5 flex-wrap items-center">
+                  <span class="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-100 text-indigo-700 border border-slate-200">
+                    ${work.category || 'General'}
+                  </span>
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded-full border ${getPriorityStyle(work.priority)}">
+                    ${work.priority}
+                  </span>
+                  ${getCompletedTickHTML(work)}
+                </div>
+                
+                <!-- Card Action Controls -->
+                <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                  <button data-id="${work.id}" class="btn-inline-edit p-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 rounded transition" title="Edit Entry">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                  </button>
+                  <button data-id="${work.id}" class="btn-inline-delete p-1 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded transition" title="Delete Entry">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.109 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="space-y-1">
+                <h3 class="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition truncate">${work.title}</h3>
+                <p class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">${work.description || 'No objective outlined.'}</p>
+                ${clientMarkup}
+              </div>
+              
+              <!-- Payment Summary Tag on Directory Card -->
+              <div class="pt-1 flex items-center justify-between">
+                <span class="text-[9px] font-bold px-2 py-0.5 rounded border ${getPaymentStyle(work.paymentStatus || 'Unpaid')}">${work.paymentStatus || 'Unpaid'}</span>
+                <span class="text-[10px] font-semibold text-slate-600">${budgetText} total</span>
+              </div>
+            </div>
+
+            <!-- Footer progress trackers -->
+            <div class="border-t border-slate-100 pt-3 mt-4 space-y-2">
+              <div class="flex items-center justify-between text-[10px] text-slate-500">
+                <span class="flex items-center gap-1">
+                  <span class="text-slate-400 font-medium">Stage:</span>
+                  <span class="bg-slate-50 text-slate-700 font-bold px-1.5 py-0.5 rounded border border-slate-200">${work.currentStage}</span>
+                </span>
+                <span class="font-semibold text-slate-600">${finishedTasksLength}/${tasksLength} Checklist</span>
+              </div>
+              <div class="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
+                <div class="bg-indigo-600 h-full transition-all duration-200" style="width: ${percent}%"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.querySelectorAll('.work-directory-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.btn-inline-edit') || e.target.closest('.btn-inline-delete')) return;
+          state.selectedWorkId = card.dataset.id;
+          dom.workDetailsDrawer.classList.remove('hidden');
+          updateAppView();
+        });
+      });
+
+      attachInlineActionListeners();
+    };
+
+    // --- TAB 3: RENDER VISUAL KANBAN BOARD ---
+    const renderKanbanBoard = () => {
+      if (state.workflows.length === 0) {
+        dom.kanbanBoardColumns.innerHTML = `
+          <div class="bg-white border border-slate-200 rounded-2xl p-16 text-center text-slate-400 max-w-xl mx-auto w-full col-span-full">
+            <span class="text-4xl block mb-4">⚡</span>
+            <p class="text-sm font-semibold mb-1 text-slate-700">No active pipelines defined</p>
+            <p class="text-xs max-w-sm mx-auto mb-4">To view the Kanban board, please create your first pipeline layout in the "Templates" tab.</p>
+            <button data-goto-tab="pipelines" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2 px-4 rounded-xl transition">Configure Templates &rarr;</button>
+          </div>
+        `;
+        return;
+      }
+
+      const activeWf = state.workflows.find(w => w.id === state.boardWorkflowFilter) || state.workflows[0];
+      if (!activeWf) return;
+
+      if (!activeWf.stages || activeWf.stages.length === 0) {
+        dom.kanbanBoardColumns.innerHTML = `
+          <div class="bg-white border border-slate-200 rounded-xl p-8 text-center text-slate-400 text-xs w-full">
+            No active sequential stages mapped inside this pipeline configuration.
+          </div>
+        `;
+        return;
+      }
+
+      dom.kanbanBoardColumns.innerHTML = activeWf.stages.map((stage, stageIndex) => {
+        const stageWorks = state.works.filter(w => w.workflowId === activeWf.id && w.currentStage === stage);
+        const isFinalStage = stageIndex === activeWf.stages.length - 1;
+
+        return `
+          <div class="w-full lg:w-80 bg-slate-100/40 border border-slate-200 rounded-2xl flex flex-col shrink-0 overflow-hidden shadow-sm">
+            <!-- Stage Title Header -->
+            <div class="p-4 bg-white border-b border-slate-200/80 flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full ${isFinalStage ? 'bg-emerald-500' : 'bg-indigo-600'}"></span>
+                <h4 class="text-[10px] font-bold text-slate-800 uppercase tracking-wider">${stage}</h4>
+              </div>
+              <span class="text-[10px] bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full font-bold text-slate-500">
+                ${stageWorks.length}
+              </span>
+            </div>
+
+            <!-- Stage works inner wrap -->
+            <div class="p-3.5 space-y-3 min-h-[350px] max-h-[480px] overflow-y-auto">
+              ${stageWorks.length === 0 ? `
+                <div class="h-[220px] flex flex-col items-center justify-center border border-dashed border-slate-200 rounded-xl p-4 text-center">
+                  <span class="text-[10px] text-slate-400">Empty Step Phase</span>
+                </div>
+              ` : stageWorks.map(work => {
+                const tasksLength = work.tasks ? work.tasks.length : 0;
+                const doneTasksLength = work.tasks ? work.tasks.filter(t => t.done).length : 0;
+                const budgetText = formatCurrency(work.totalBudget || 0);
+
+                const clientMarkup = work.clientName ? `<p class="text-[9px] text-slate-500 italic truncate mb-1">Client: ${work.clientName}</p>` : '';
+                const completionBadge = isFinalStage ? `
+                  <span class="absolute top-3 right-3 flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 border border-emerald-300 shadow-sm animate-bounce text-emerald-700">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="4.5" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                    </svg>
+                  </span>
+                ` : '';
+
+                return `
+                  <div data-id="${work.id}" class="kanban-work-card bg-white border border-slate-200 hover:border-slate-300 p-4 rounded-xl shadow-sm hover:shadow transition duration-150 cursor-pointer group relative">
+                    ${completionBadge}
+                    
+                    <div class="flex justify-between items-start mb-2 pr-12">
+                      <div class="flex flex-wrap gap-1">
+                        <span class="text-[8px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-indigo-700">
+                          ${work.category || 'General'}
+                        </span>
+                        <span class="text-[8px] font-bold px-1.5 py-0.5 rounded border ${getPriorityStyle(work.priority)}">
+                          ${work.priority}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Direct Card Controls on Kanban -->
+                    <div class="absolute right-3 top-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                      <button data-id="${work.id}" class="btn-inline-edit p-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 rounded transition" title="Edit Entry">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                      </button>
+                      <button data-id="${work.id}" class="btn-inline-delete p-1 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded transition" title="Delete Entry">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.109 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                      </button>
+                    </div>
+
+                    <h5 class="text-xs font-bold text-slate-800 group-hover:text-indigo-600 transition mb-1 truncate">${work.title}</h5>
+                    ${clientMarkup}
+                    <p class="text-[10px] text-slate-400 line-clamp-2 leading-relaxed mb-2">${work.description || 'No objective summary saved.'}</p>
+                    
+                    <!-- Payments tracking tag on Kanban -->
+                    <div class="flex justify-between items-center mb-3">
+                      <span class="text-[8px] font-bold px-1.5 py-0.5 rounded border ${getPaymentStyle(work.paymentStatus || 'Unpaid')}">${work.paymentStatus || 'Unpaid'}</span>
+                      <span class="text-[9px] font-semibold text-slate-600">${budgetText}</span>
+                    </div>
+
+                    ${tasksLength > 0 ? `
+                      <div class="flex items-center justify-between text-[9px] text-slate-400 border-t border-slate-100 pt-2">
+                        <span>Checklist progress</span>
+                        <span class="font-bold text-slate-600">${doneTasksLength}/${tasksLength}</span>
+                      </div>
+                    ` : ''}
+
+                    <!-- Manual Stepper Advance Controls -->
+                    <div class="mt-3.5 pt-3 border-t border-slate-100 flex justify-between gap-1">
+                      <button
+                        data-action="demote"
+                        data-work-id="${work.id}"
+                        data-current-idx="${stageIndex}"
+                        ${stageIndex === 0 ? 'disabled' : ''}
+                        class="stepper-advance-btn flex-1 text-[9px] bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-700 py-1 rounded transition disabled:opacity-40"
+                        title="Demote Stage"
+                      >
+                        &larr; Back
+                      </button>
+                      <button
+                        data-action="promote"
+                        data-work-id="${work.id}"
+                        data-current-idx="${stageIndex}"
+                        ${stageIndex === activeWf.stages.length - 1 ? 'disabled' : ''}
+                        class="stepper-advance-btn flex-1 text-[9px] bg-slate-50 hover:bg-indigo-50 border border-slate-200 text-slate-500 hover:text-indigo-600 py-1 rounded transition disabled:opacity-40 font-semibold"
+                        title="Advance Stage"
+                      >
+                        Next &rarr;
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.querySelectorAll('.kanban-work-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.stepper-advance-btn') || e.target.closest('.btn-inline-edit') || e.target.closest('.btn-inline-delete')) return;
+          state.selectedWorkId = card.dataset.id;
+          dom.workDetailsDrawer.classList.remove('hidden');
+          updateAppView();
+        });
+      });
+
+      document.querySelectorAll('.stepper-advance-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const action = btn.dataset.action;
+          const workId = btn.dataset.workId;
+          const currentIdx = parseInt(btn.dataset.currentIdx);
+          
+          const workObj = state.works.find(w => w.id === workId);
+          if (!workObj) return;
+
+          let targetStage = '';
+          if (action === 'promote') {
+            targetStage = activeWf.stages[currentIdx + 1];
+          } else {
+            targetStage = activeWf.stages[currentIdx - 1];
+          }
+
+          if (targetStage) {
+            try {
+              const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'works', workId);
+              await updateDoc(docRef, { currentStage: targetStage, updatedAt: new Date().toISOString() });
+              triggerToast(`Stage update saved: "${targetStage}"`);
+            } catch (err) {
+              state.works = state.works.map(w => w.id === workId ? { ...w, currentStage: targetStage, updatedAt: new Date().toISOString() } : w);
+              updateAppView();
+              triggerToast(`Moved status to "${targetStage}" locally.`);
+            }
+          }
+        });
+      });
+
+      attachInlineActionListeners();
+    };
+
+    // --- TAB 4: RENDER PIPELINE CONFIGURATOR ---
+    const renderPipelineConfigurator = () => {
+      dom.pipelinesList.innerHTML = state.workflows.map(wf => {
+        const isPreset = ['wf-creative', 'wf-dev', 'wf-simple'].includes(wf.id);
+
+        return `
+          <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
+            <div class="flex justify-between items-start gap-4">
+              <div class="space-y-1">
+                <h3 class="text-sm font-bold text-slate-800">${wf.name}</h3>
+                <p class="text-[10px] text-slate-400 font-mono">Reference Key: ${wf.id}</p>
+              </div>
+
+              ${!isPreset ? `
+                <button
+                  data-delete-wf-id="${wf.id}"
+                  class="delete-workflow-btn text-[9px] font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-lg transition"
+                >
+                  Delete custom
+                </button>
+              ` : `
+                <span class="text-[9px] bg-slate-100 text-slate-500 px-2 py-1 rounded-lg border border-slate-200 font-bold">Preset System Standard</span>
+              `}
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Badge Styling Color:</span>
+              <span class="text-[9px] font-bold px-2 py-0.5 rounded border uppercase ${getBadgeColor(wf.color)}">${wf.color}</span>
+            </div>
+
+            <!-- Step Journey overview list -->
+            <div class="space-y-2">
+              <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Stages sequence:</h4>
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2.5">
+                ${wf.stages.map((stage, sIndex) => `
+                  <div class="flex items-center gap-3">
+                    <span class="w-5 h-5 rounded-full bg-white text-indigo-600 flex items-center justify-center text-[10px] font-bold border border-slate-200 shadow-sm">${sIndex + 1}</span>
+                    <span class="text-xs text-slate-600 font-medium">${stage}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.querySelectorAll('.delete-workflow-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const idToDelete = btn.dataset.deleteWfId;
+          const activeDepends = state.works.some(w => w.workflowId === idToDelete);
+          if (activeDepends) {
+            triggerToast("Cannot delete pipeline. Active works currently depend on its sequential stages.", true);
+            return;
+          }
+
+          const confirmed = await confirmDeleteModal("Delete this custom workflow pipeline? Active board structures linked to this workflow will revert to simplicity defaults.");
+          if (!confirmed) return;
+
+          try {
+            const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'workflows', idToDelete);
+            await deleteDoc(docRef);
+            triggerToast("Pipeline template deleted.");
+            if (state.boardWorkflowFilter === idToDelete) {
+              state.boardWorkflowFilter = state.workflows.find(w => w.id !== idToDelete)?.id || 'wf-simple';
+            }
+          } catch (err) {
+            state.workflows = state.workflows.filter(w => w.id !== idToDelete);
+            updateAppView();
+            triggerToast("Pipeline removed locally.");
+          }
+        });
+      });
+    };
+
+    // --- Mass Configuration Clear Helper (Feature: remove all templates) ---
+    dom.clearAllCustomPipelinesBtn.addEventListener('click', async () => {
+      const customTemplates = state.workflows.filter(w => !['wf-creative', 'wf-dev', 'wf-simple'].includes(w.id));
+      if (customTemplates.length === 0) {
+        triggerToast("No custom pipeline templates found to remove.", true);
+        return;
+      }
+
+      const confirmed = await confirmDeleteModal(`Are you sure you want to remove all (${customTemplates.length}) custom workflow pipelines? Projects linked to deleted templates will fall back to default simple lifecycles.`);
+      if (!confirmed) return;
+
+      try {
+        dom.loadingOverlay.classList.remove('hidden');
+        for (const wf of customTemplates) {
+          const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'workflows', wf.id);
+          await deleteDoc(docRef);
+        }
+        triggerToast("Cleared all user-configured custom pipelines successfully.");
+        state.boardWorkflowFilter = 'wf-simple';
+      } catch (err) {
+        console.error("Purging templates failed: ", err);
+        triggerToast("Failed to remove template objects.", true);
+      } finally {
+        dom.loadingOverlay.classList.add('hidden');
+        updateAppView();
+      }
+    });
+
+    // --- SLIDE DRAWER DETAILS VIEW ---
+    const renderDrawerSpecWindow = () => {
+      if (!state.selectedWorkId) return;
+
+      const work = state.works.find(w => w.id === state.selectedWorkId);
+      if (!work) {
+        dom.workDetailsDrawer.classList.add('hidden');
+        state.selectedWorkId = null;
+        return;
+      }
+
+      // Sync texts
+      dom.drawerTitle.textContent = work.title;
+      dom.drawerCategoryBadge.textContent = work.category || 'General';
+      
+      dom.drawerPriorityBadge.textContent = work.priority;
+      dom.drawerPriorityBadge.className = `text-[9px] font-bold tracking-wider px-2 py-0.5 rounded-full border ${getPriorityStyle(work.priority)}`;
+
+      dom.drawerPaymentBadge.textContent = work.paymentStatus || 'Unpaid';
+      dom.drawerPaymentBadge.className = `text-[9px] font-bold tracking-wider px-2 py-0.5 rounded-full border ${getPaymentStyle(work.paymentStatus || 'Unpaid')}`;
+
+      // Dynamic completed tick icon validation (Feature: Complete pipeline green tick indicator)
+      const existingTick = document.getElementById('drawerGreenCompletedTickBadge');
+      if (existingTick) existingTick.remove();
+
+      if (isProjectLifecycleCompleted(work)) {
+        const completedTick = document.createElement('span');
+        completedTick.id = 'drawerGreenCompletedTickBadge';
+        completedTick.className = 'inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-[9px] font-extrabold px-2.5 py-0.5 rounded-full border border-emerald-300 shadow-sm animate-pulse shrink-0';
+        completedTick.innerHTML = `
+          <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="3.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+          </svg>
+          Stage Closed & Completed
+        `;
+        document.getElementById('drawerCompletedBadgeWrapper').prepend(completedTick);
+      }
+
+      // Render Client metadata box (Feature: Client details integration)
+      if (work.clientName) {
+        const emailInfo = work.clientContact ? ` &bull; ${work.clientContact}` : '';
+        dom.drawerClientBox.innerHTML = `
+          <div class="flex items-center gap-1.5 bg-slate-100/60 p-2.5 rounded-xl border border-slate-200 mt-1">
+            <span class="text-slate-400 font-bold text-[9px] uppercase tracking-wider">Client Portfolio:</span>
+            <span class="font-bold text-slate-800 text-xs">${work.clientName}</span>
+            <span class="text-slate-500">${emailInfo}</span>
+          </div>
+        `;
+      } else {
+        dom.drawerClientBox.innerHTML = '';
+      }
+
+      // Budget display inside drawer
+      const budgetNum = parseFloat(work.totalBudget || 0);
+      const paidNum = parseFloat(work.amountPaid || 0);
+      const balanceNum = budgetNum - paidNum;
+
+      dom.drawerBudget.textContent = formatCurrency(budgetNum);
+      dom.drawerAmountPaid.textContent = formatCurrency(paidNum);
+      dom.drawerBalance.textContent = formatCurrency(balanceNum);
+
+      dom.drawerDescDisplay.textContent = work.description || 'No objectives declared for this spec.';
+      dom.drawerModificationDate.textContent = `Last synchronized: ${work.updatedAt ? new Date(work.updatedAt).toLocaleString() : 'N/A'}`;
+
+      // Stepper Stages setup - Enhanced with beautiful green ticks on closed stages & solid colors
+      const activeWf = state.workflows.find(w => w.id === work.workflowId) || { id: 'wf-simple', name: 'Standard Pipeline', stages: ['To Do', 'Active Works', 'Complete'], color: 'purple' };
+      const currentStageIndex = activeWf.stages.indexOf(work.currentStage);
+
+      dom.drawerStepperContainer.innerHTML = activeWf.stages.map((stage, stepIndex) => {
+        const isCurrent = work.currentStage === stage;
+        const isCompleted = stepIndex <= currentStageIndex;
+
+        let btnClass = '';
+        let tickIcon = '';
+
+        if (isCurrent) {
+          // Solid shaded green box with tick
+          btnClass = 'bg-emerald-600 text-white font-bold border-emerald-700 shadow-md ring-2 ring-emerald-500/25';
+          tickIcon = `<span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-white text-emerald-600 text-[9px] font-black mr-1 shrink-0">✓</span>`;
+        } else if (isCompleted) {
+          // Shaded light green box with tick
+          btnClass = 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold border-emerald-200 shadow-sm';
+          tickIcon = `<span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-600 text-white text-[9px] font-bold mr-1 shrink-0">✓</span>`;
+        } else {
+          // Standard pending box
+          btnClass = 'bg-white hover:bg-slate-50 text-slate-500 border-slate-200';
+        }
+
+        return `
+          <button
+            data-target-stage="${stage}"
+            class="drawer-step-btn text-[9px] p-2 text-left rounded-lg transition border leading-tight flex flex-col justify-between ${btnClass}"
+          >
+            <div>
+              <span class="${isCurrent ? 'text-emerald-100' : 'text-slate-400'} block text-[8px] uppercase font-bold">Step ${stepIndex + 1}</span>
+              <span class="flex items-center mt-1 truncate">
+                ${tickIcon}
+                <span class="truncate">${stage}</span>
+              </span>
+            </div>
+          </button>
+        `;
+      }).join('');
+
+      document.querySelectorAll('.drawer-step-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const targetStage = btn.dataset.targetStage;
+          try {
+            const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'works', work.id);
+            await updateDoc(docRef, { currentStage: targetStage, updatedAt: new Date().toISOString() });
+            triggerToast(`Work stage shifted: "${targetStage}"`);
+          } catch (err) {
+            state.works = state.works.map(w => w.id === work.id ? { ...w, currentStage: targetStage, updatedAt: new Date().toISOString() } : w);
+            updateAppView();
+            triggerToast(`Shifted stage to "${targetStage}" locally.`);
+          }
+        });
+      });
+
+      // Render Checklists
+      const tasksList = work.tasks || [];
+      const tasksDoneCount = tasksList.filter(t => t.done).length;
+      dom.drawerChecklistMetric.textContent = `${tasksDoneCount}/${tasksList.length} Milestones`;
+
+      if (tasksList.length === 0) {
+        dom.drawerSubtaskList.innerHTML = `<p class="text-[10px] text-slate-400 italic">No checklist milestones listed. Use the field above to add milestones.</p>`;
+      } else {
+        dom.drawerSubtaskList.innerHTML = tasksList.map(task => `
+          <div data-task-id="${task.id}" class="drawer-task-row flex items-center gap-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 p-2.5 rounded-lg cursor-pointer transition">
+            <input
+              type="checkbox"
+              ${task.done ? 'checked' : ''}
+              class="rounded text-indigo-600 focus:ring-0 cursor-pointer pointer-events-none"
+            />
+            <span class="text-xs ${task.done ? 'line-through text-slate-400' : 'text-slate-600 font-medium'}">
+              ${task.text}
+            </span>
+          </div>
+        `).join('');
+
+        document.querySelectorAll('.drawer-task-row').forEach(row => {
+          row.addEventListener('click', async () => {
+            const tId = row.dataset.taskId;
+            const updatedTasks = tasksList.map(t => t.id === tId ? { ...t, done: !t.done } : t);
+
+            try {
+              const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'works', work.id);
+              await updateDoc(docRef, { tasks: updatedTasks });
+            } catch (err) {
+              state.works = state.works.map(w => w.id === work.id ? { ...w, tasks: updatedTasks } : w);
+              updateAppView();
+            }
+          });
+        });
+      }
+
+      if (work.referenceUrl) {
+        dom.drawerReferenceContainer.classList.remove('hidden');
+        dom.drawerReferenceLink.href = work.referenceUrl;
+        dom.drawerReferenceLink.textContent = work.referenceUrl;
+      } else {
+        dom.drawerReferenceContainer.classList.add('hidden');
+      }
+
+      if (!state.isEditingNote) {
+        dom.notesDisplayBox.classList.remove('hidden');
+        dom.notesEditArea.classList.add('hidden');
+        dom.notesDisplayBox.textContent = work.notes || "Write speculative outline notes, research links, system diagrams, architecture specs...";
+        
+        dom.editNotesBtn.classList.remove('hidden');
+        dom.cancelNotesEditBtn.classList.add('hidden');
+        dom.saveNotesBtn.classList.add('hidden');
+      } else {
+        dom.notesDisplayBox.classList.add('hidden');
+        dom.notesEditArea.classList.remove('hidden');
+        
+        dom.editNotesBtn.classList.add('hidden');
+        dom.cancelNotesEditBtn.classList.remove('hidden');
+        dom.saveNotesBtn.classList.remove('hidden');
+      }
+    };
+
+    // Sub-task checklist creation bindings
+    dom.addSubtaskBtn.addEventListener('click', async () => {
+      const val = dom.newSubtaskInput.value.trim();
+      if (!val) return;
+
+      const work = state.works.find(w => w.id === state.selectedWorkId);
+      if (!work) return;
+
+      const newTask = {
+        id: `task-${Date.now()}`,
+        text: val,
+        done: false
+      };
+
+      const updatedTasks = [...(work.tasks || []), newTask];
+
+      try {
+        const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'works', work.id);
+        await updateDoc(docRef, { tasks: updatedTasks });
+        dom.newSubtaskInput.value = '';
+      } catch (err) {
+        state.works = state.works.map(w => w.id === work.id ? { ...w, tasks: updatedTasks } : w);
+        updateAppView();
+        dom.newSubtaskInput.value = '';
+      }
+    });
+
+    // Reference Link Copy Action (Clipboard rule support)
+    dom.copyReferenceUrlBtn.addEventListener('click', () => {
+      const hrefVal = dom.drawerReferenceLink.href;
+      if (!hrefVal) return;
+
+      const helperArea = document.createElement('textarea');
+      helperArea.value = hrefVal;
+      document.body.appendChild(helperArea);
+      helperArea.select();
+      try {
+        document.execCommand('copy');
+        triggerToast("Reference URL link copied to workspace clipboard.");
+      } catch (err) {
+        triggerToast("Clipboard execution blocked by browser iframe.", true);
+      }
+      document.body.removeChild(helperArea);
+    });
+
+    // Scratchpad edit trigger action loop
+    dom.editNotesBtn.addEventListener('click', () => {
+      const work = state.works.find(w => w.id === state.selectedWorkId);
+      if (!work) return;
+      dom.notesEditArea.value = work.notes || '';
+      state.isEditingNote = true;
+      renderDrawerSpecWindow();
+    });
+
+    dom.cancelNotesEditBtn.addEventListener('click', () => {
+      state.isEditingNote = false;
+      renderDrawerSpecWindow();
+    });
+
+    dom.saveNotesBtn.addEventListener('click', async () => {
+      const work = state.works.find(w => w.id === state.selectedWorkId);
+      if (!work) return;
+      const notesValue = dom.notesEditArea.value;
+
+      try {
+        const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'works', work.id);
+        await updateDoc(docRef, { notes: notesValue });
+        state.isEditingNote = false;
+        triggerToast("Spec notes updated.");
+      } catch (err) {
+        state.works = state.works.map(w => w.id === work.id ? { ...w, notes: notesValue } : w);
+        state.isEditingNote = false;
+        updateAppView();
+        triggerToast("Spec notes updated locally.");
+      }
+    });
+
+    // Deletion Action trigger Inside Slide drawer
+    dom.deleteWorkBtn.addEventListener('click', async () => {
+      const work = state.works.find(w => w.id === state.selectedWorkId);
+      if (!work) return;
+      handleDeleteRecord(work.id);
+    });
+
+    dom.drawerEditWorkBtn.addEventListener('click', () => {
+      const work = state.works.find(w => w.id === state.selectedWorkId);
+      if (!work) return;
+      handleEditRecordPrompt(work.id);
+    });
+
+    dom.closeDrawerBtn.addEventListener('click', () => {
+      dom.workDetailsDrawer.classList.add('hidden');
+      state.selectedWorkId = null;
+    });
+
+    // --- Inline & Drawer edit / delete controllers ---
+    const handleDeleteRecord = async (id) => {
+      const work = state.works.find(w => w.id === id);
+      if (!work) return;
+
+      const confirmed = await confirmDeleteModal(`Permanently delete "${work.title}"? Your saved scratchpad outlines, payment stats and checklists will be cleared.`);
+      if (!confirmed) return;
+
+      try {
+        const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'works', id);
+        await deleteDoc(docRef);
+        triggerToast("Project deleted successfully.");
+        if (state.selectedWorkId === id) {
+          dom.workDetailsDrawer.classList.add('hidden');
+          state.selectedWorkId = null;
+        }
+      } catch (err) {
+        state.works = state.works.filter(w => w.id !== id);
+        if (state.selectedWorkId === id) {
+          dom.workDetailsDrawer.classList.add('hidden');
+          state.selectedWorkId = null;
+        }
+        updateAppView();
+        triggerToast("Project deleted locally.");
+      }
+    };
+
+    const handleEditRecordPrompt = (id) => {
+      const work = state.works.find(w => w.id === id);
+      if (!work) return;
+
+      document.getElementById('editWorkId').value = work.id;
+      document.getElementById('editWorkTitle').value = work.title;
+      document.getElementById('editWorkDesc').value = work.description || '';
+      document.getElementById('editWorkClientName').value = work.clientName || '';
+      document.getElementById('editWorkClientContact').value = work.clientContact || '';
+      document.getElementById('editWorkCategory').value = work.category || '';
+      document.getElementById('editWorkPriority').value = work.priority || 'Medium';
+      document.getElementById('editWorkWorkflowId').value = work.workflowId || '';
+      document.getElementById('editWorkReferenceUrl').value = work.referenceUrl || '';
+      
+      const paymentStatus = work.paymentStatus || 'Unpaid';
+      document.getElementById('editWorkPaymentStatus').value = paymentStatus;
+      document.getElementById('editWorkBudget').value = work.totalBudget || 0;
+      
+      if (paymentStatus === 'Advance Paid') {
+        document.getElementById('editWorkAdvancePaidContainer').classList.remove('hidden');
+        document.getElementById('editWorkAmountPaidContainer').classList.add('hidden');
+        document.getElementById('editWorkAdvanceAmount').value = work.amountPaid || 0;
+      } else {
+        document.getElementById('editWorkAdvancePaidContainer').classList.add('hidden');
+        document.getElementById('editWorkAmountPaidContainer').classList.remove('hidden');
+        document.getElementById('editWorkAmountPaid').value = work.amountPaid || 0;
+      }
+
+      dom.editWorkModal.classList.remove('hidden');
+      dom.editWorkModal.classList.add('flex');
+    };
+
+    function attachInlineActionListeners() {
+      document.querySelectorAll('.btn-inline-edit').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          handleEditRecordPrompt(btn.dataset.id);
+        });
+      });
+
+      document.querySelectorAll('.btn-inline-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          handleDeleteRecord(btn.dataset.id);
+        });
+      });
+    }
+
+    // --- CRUD WORK SPEC CREATION HANDLERS ---
+    dom.newWorkForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!state.user) return;
+
+      const title = document.getElementById('newWorkTitle').value.trim();
+      const desc = document.getElementById('newWorkDesc').value.trim();
+      const clientName = document.getElementById('newWorkClientName').value.trim();
+      const clientContact = document.getElementById('newWorkClientContact').value.trim();
+      const cat = document.getElementById('newWorkCategory').value.trim() || 'General';
+      const priority = document.getElementById('newWorkPriority').value;
+      const wfId = document.getElementById('newWorkWorkflowId').value;
+      const refUrl = document.getElementById('newWorkReferenceUrl').value.trim();
+      const paymentStatus = document.getElementById('newWorkPaymentStatus').value;
+      const budget = parseFloat(document.getElementById('newWorkBudget').value || 0);
+
+      if (!wfId) {
+        triggerToast("Please configure at least one Pipeline Template first in the Templates tab.", true);
+        return;
+      }
+      
+      // Feature: dynamic advance amount calculation
+      let paid = 0;
+      if (paymentStatus === 'Advance Paid') {
+        paid = parseFloat(document.getElementById('newWorkAdvanceAmount').value || 0);
+      } else {
+        paid = parseFloat(document.getElementById('newWorkAmountPaid').value || 0);
+      }
+
+      if (!title) {
+        triggerToast("Project title field is required.", true);
+        return;
+      }
+
+      const matchedPipeline = state.workflows.find(w => w.id === wfId) || { stages: ['To Do'] };
+      const initialStage = matchedPipeline.stages[0] || 'To Do';
+
+      const workItemData = {
+        title: title,
+        description: desc,
+        clientName: clientName,
+        clientContact: clientContact,
+        category: cat,
+        priority: priority,
+        paymentStatus: paymentStatus,
+        totalBudget: budget,
+        amountPaid: paid,
+        workflowId: wfId,
+        currentStage: initialStage,
+        referenceUrl: refUrl,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        notes: '',
+        tasks: []
+      };
+
+      try {
+        const worksCol = collection(db, 'artifacts', appId, 'users', state.user.uid, 'works');
+        await addDoc(worksCol, workItemData);
+        triggerToast(`Work record created for "${title}"!`);
+        dom.newWorkForm.reset();
+        document.getElementById('newWorkAdvancePaidContainer').classList.add('hidden');
+        document.getElementById('newWorkAmountPaidContainer').classList.remove('hidden');
+        dom.newWorkModal.classList.add('hidden');
+      } catch (err) {
+        const localId = `work-${Date.now()}`;
+        state.works.push({ id: localId, ...workItemData });
+        updateAppView();
+        dom.newWorkForm.reset();
+        document.getElementById('newWorkAdvancePaidContainer').classList.add('hidden');
+        document.getElementById('newWorkAmountPaidContainer').classList.remove('hidden');
+        dom.newWorkModal.classList.add('hidden');
+        triggerToast(`Recorded locally: "${title}"`);
+      }
+    });
+
+    // --- CRUD WORK SPEC EDIT SUBMISSION HANDLER ---
+    dom.editWorkForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!state.user) return;
+
+      const id = document.getElementById('editWorkId').value;
+      const title = document.getElementById('editWorkTitle').value.trim();
+      const desc = document.getElementById('editWorkDesc').value.trim();
+      const clientName = document.getElementById('editWorkClientName').value.trim();
+      const clientContact = document.getElementById('editWorkClientContact').value.trim();
+      const cat = document.getElementById('editWorkCategory').value.trim() || 'General';
+      const priority = document.getElementById('editWorkPriority').value;
+      const wfId = document.getElementById('editWorkWorkflowId').value;
+      const refUrl = document.getElementById('editWorkReferenceUrl').value.trim();
+      const paymentStatus = document.getElementById('editWorkPaymentStatus').value;
+      const budget = parseFloat(document.getElementById('editWorkBudget').value || 0);
+      
+      let paid = 0;
+      if (paymentStatus === 'Advance Paid') {
+        paid = parseFloat(document.getElementById('editWorkAdvanceAmount').value || 0);
+      } else {
+        paid = parseFloat(document.getElementById('editWorkAmountPaid').value || 0);
+      }
+
+      if (!title) {
+        triggerToast("Project title field is required.", true);
+        return;
+      }
+
+      const work = state.works.find(w => w.id === id);
+      if (!work) return;
+
+      const updatedPayload = {
+        title: title,
+        description: desc,
+        clientName: clientName,
+        clientContact: clientContact,
+        category: cat,
+        priority: priority,
+        paymentStatus: paymentStatus,
+        totalBudget: budget,
+        amountPaid: paid,
+        workflowId: wfId,
+        referenceUrl: refUrl,
+        updatedAt: new Date().toISOString()
+      };
+
+      try {
+        const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'works', id);
+        await updateDoc(docRef, updatedPayload);
+        triggerToast("Spec metrics updated.");
+        dom.editWorkModal.classList.add('hidden');
+      } catch (err) {
+        state.works = state.works.map(w => w.id === id ? { ...w, ...updatedPayload } : w);
+        updateAppView();
+        dom.editWorkModal.classList.add('hidden');
+        triggerToast("Spec metrics updated locally.");
+      }
+    });
+
+    // --- CRUD PIPELINE CREATION HANDLERS ---
+    dom.addStageToDraftBtn.addEventListener('click', () => {
+      const val = dom.newPipelineStageInput.value.trim();
+      if (!val) return;
+      if (state.draftPipelineStages.includes(val)) {
+        triggerToast("Phase stage already added to this workflow outline.", true);
+        return;
+      }
+      state.draftPipelineStages.push(val);
+      dom.newPipelineStageInput.value = '';
+      renderPipelineDraftStages();
+    });
+
+    const renderPipelineDraftStages = () => {
+      dom.newPipelineDraftStages.innerHTML = state.draftPipelineStages.map((stg, index) => `
+        <div class="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border border-slate-200">
+          <span class="text-xs text-slate-700 font-medium">${index + 1}. ${stg}</span>
+          <button
+            type="button"
+            data-draft-stage-name="${stg}"
+            class="remove-draft-stage-btn text-[10px] text-rose-600 hover:underline font-bold"
+          >
+            ✕ Remove
+          </button>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.remove-draft-stage-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const name = btn.dataset.draftStageName;
+          state.draftPipelineStages = state.draftPipelineStages.filter(s => s !== name);
+          renderPipelineDraftStages();
+        });
+      });
+    };
+
+    // Color Pick trigger handler bindings
+    document.querySelectorAll('.color-picker-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.draftPipelineColor = btn.dataset.color;
+        document.querySelectorAll('.color-picker-btn').forEach(item => {
+          if (item.dataset.color === state.draftPipelineColor) {
+            item.className = `color-picker-btn capitalize flex-1 text-[10px] py-1.5 px-1 rounded-lg border border-indigo-400 bg-indigo-50 text-indigo-700 font-bold transition`;
+          } else {
+            item.className = `color-picker-btn capitalize flex-1 text-[10px] py-1.5 px-1 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition`;
+          }
+        });
+      });
+    });
+
+    dom.newPipelineForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!state.user) return;
+
+      const name = document.getElementById('newPipelineName').value.trim();
+      if (!name) {
+        triggerToast("Workflow template requires an identifier name.", true);
+        return;
+      }
+      if (state.draftPipelineStages.length < 2) {
+        triggerToast("Workflow requires at least two sequential stages to function.", true);
+        return;
+      }
+
+      const customWorkflowId = `wf-custom-${Date.now()}`;
+      const workflowData = {
+        id: customWorkflowId,
+        name: name,
+        stages: state.draftPipelineStages,
+        color: state.draftPipelineColor
+      };
+
+      try {
+        const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'workflows', customWorkflowId);
+        await setDoc(docRef, workflowData);
+        triggerToast(`Workflow config template "${name}" compiled!`);
+        
+        // Reset configuration parameters
+        document.getElementById('newPipelineName').value = '';
+        state.draftPipelineStages = ['To Do', 'In Progress', 'Completed'];
+        dom.newPipelineModal.classList.add('hidden');
+        state.boardWorkflowFilter = customWorkflowId;
+      } catch (err) {
+        state.workflows.push(workflowData);
+        state.boardWorkflowFilter = customWorkflowId;
+        updateAppView();
+        document.getElementById('newPipelineName').value = '';
+        state.draftPipelineStages = ['To Do', 'In Progress', 'Completed'];
+        dom.newPipelineModal.classList.add('hidden');
+        triggerToast(`Saved locally: "${name}"`);
+      }
+    });
+
+    // --- NAVIGATION TAB DISPATCH ENGINE ---
+    const switchNavigationTab = (targetTabId) => {
+      state.activeTab = targetTabId;
+      
+      // Update UI state links active classes
+      document.querySelectorAll('.tab-trigger').forEach(btn => {
+        const matched = btn.dataset.tab === targetTabId;
+        btn.classList.toggle('bg-slate-100', matched);
+        btn.classList.toggle('text-slate-950', matched);
+        btn.classList.toggle('text-slate-600', !matched);
+      });
+
+      // Show/Hide divs
+      document.querySelectorAll('.tab-content').forEach(view => {
+        view.classList.toggle('active', view.id === `tab-${targetTabId}`);
+      });
+
+      updateAppView();
+    };
+
+    document.querySelectorAll('.tab-trigger').forEach(btn => {
+      btn.addEventListener('click', () => switchNavigationTab(btn.dataset.tab));
+    });
+
+    // Setup direct routing shortcuts
+    document.querySelectorAll('[data-goto-tab]').forEach(elem => {
+      elem.addEventListener('click', () => switchNavigationTab(elem.dataset.gotoTab));
+    });
+
+    // --- DIALOG MODAL TRANSITION TRIGGERS ---
+    const setupModalTrigger = (openBtn, modalElem) => {
+      openBtn.addEventListener('click', () => {
+        modalElem.classList.remove('hidden');
+        modalElem.classList.add('flex');
+        
+        // Custom actions when opening modals
+        if (modalElem === dom.newPipelineModal) {
+          renderPipelineDraftStages();
+        }
+      });
+    };
+
+    setupModalTrigger(dom.openNewWorkBtn, dom.newWorkModal);
+    setupModalTrigger(dom.dashNewWorkBtn, dom.newWorkModal);
+    setupModalTrigger(dom.worksAddNewBtn, dom.newWorkModal);
+
+    setupModalTrigger(dom.openNewPipelineBtn, dom.newPipelineModal);
+    setupModalTrigger(dom.pipelinesAddNewBtn, dom.newPipelineModal);
+
+    document.querySelectorAll('.close-modal-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        dom.newWorkModal.classList.add('hidden');
+        dom.newWorkModal.classList.remove('flex');
+        dom.newPipelineModal.classList.add('hidden');
+        dom.newPipelineModal.classList.remove('flex');
+        dom.editWorkModal.classList.add('hidden');
+        dom.editWorkModal.classList.remove('flex');
+      });
+    });
+
+    // Initialize application authorization observer
+    window.onload = () => {
+      initWorkspaceAuth();
+    };
+
+    // Color mapper classes
+    const getBadgeColor = (color) => {
+      switch (color) {
+        case 'emerald': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        case 'blue': return 'bg-blue-50 text-blue-700 border-blue-200';
+        case 'purple': return 'bg-purple-50 text-purple-700 border-purple-200';
+        case 'rose': return 'bg-rose-50 text-rose-700 border-rose-200';
+        case 'indigo': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+        case 'amber': return 'bg-amber-50 text-amber-700 border-amber-200';
+        default: return 'bg-slate-100 text-slate-600 border-slate-200';
+      }
+    };
+  </script>
+</body>
+</html>
