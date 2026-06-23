@@ -13,6 +13,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   
+  <!-- Dynamic Favicon Fallback -->
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
+  <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
+
   <style>
     body {
       font-family: 'Inter', 'Noto Sans', sans-serif;
@@ -99,14 +103,14 @@
 
       <!-- Android Setup Guide -->
       <div id="installAndroidContent" class="space-y-4">
-        <!-- Native Prompt trigger CTA -->
-        <button id="androidNativeInstallBtn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-3 px-4 rounded-xl text-xs font-bold shadow-md shadow-emerald-500/10 transition duration-150 flex items-center justify-center gap-2">
+        <!-- Native Prompt trigger CTAs -->
+        <button id="androidNativeInstallBtn" class="hidden w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-3 px-4 rounded-xl text-xs font-bold shadow-md shadow-emerald-500/10 transition duration-150 flex items-center justify-center gap-2">
           🚀 Tap to Install Workspace App
         </button>
-        <!-- PWA Direct Install Button -->
-        <button id="pwaDirectInstallBtn" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white py-3 px-4 rounded-xl text-xs font-bold shadow-md shadow-indigo-500/10 transition duration-150 flex items-center justify-center gap-2">
+        <button id="pwaDirectInstallBtn" class="hidden w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white py-3 px-4 rounded-xl text-xs font-bold shadow-md shadow-indigo-500/10 transition duration-150 flex items-center justify-center gap-2">
           📲 Direct Install on Device
         </button>
+        
         <div class="text-xs text-slate-500 leading-relaxed space-y-2">
           <p class="font-semibold text-slate-700">Manual Chrome Setup Instructions:</p>
           <ol class="list-decimal pl-5 space-y-1.5 font-medium">
@@ -133,13 +137,6 @@
             <div>
               <p class="font-bold text-slate-900 text-[11px]">2. Add to Home Screen</p>
               <p class="text-[10px] text-slate-500">Scroll down and select the "Add to Home Screen" menu option.</p>
-            </div>
-          </div>
-          <div class="bg-indigo-50/50 border border-indigo-100/50 p-3.5 rounded-2xl flex items-start gap-3">
-            <span class="text-lg mt-0.5">✨</span>
-            <div>
-              <p class="font-bold text-slate-900 text-[11px]">3. Name and Save</p>
-              <p class="text-[10px] text-slate-500">Hit "Add" to save the App Icon directly onto your workspace grid.</p>
             </div>
           </div>
         </div>
@@ -235,18 +232,18 @@
       <div class="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-indigo-600"></div>
       <span class="absolute text-lg">⚡</span>
     </div>
-    <h1 class="text-xl font-bold text-slate-800">Synchronizing WorkFlowForge Workspace...</h1>
-    <p class="text-xs text-slate-400 mt-2">Connecting to modern live cloud services</p>
+    <h1 class="text-xl font-bold text-slate-800">Synchronizing WorkFlowForge...</h1>
+    <p class="text-xs text-slate-400 mt-2">Connecting to secure cloud partition</p>
   </div>
 
   <!-- Authentication Workspace Gateway -->
   <div id="authOverlay" class="fixed inset-0 z-[9990] bg-slate-50 hidden items-center justify-center p-6 overflow-y-auto">
-    <div class="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 shadow-xl space-y-6">
+    <div class="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 shadow-xl space-y-6 animate-fade-in">
       <div class="text-center space-y-1">
         <div id="authLogoWrapper" class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-400 items-center justify-center shadow-md mb-2 text-2xl text-white overflow-hidden">
           ⚡
         </div>
-        <h1 class="text-xl font-black tracking-tight text-slate-900">WorkFlowForge Light</h1>
+        <h1 class="text-xl font-black tracking-tight text-slate-900">WorkFlowForge</h1>
         <p class="text-xs text-indigo-600 font-bold uppercase tracking-wider">Secured Workspace Gateway</p>
       </div>
 
@@ -254,14 +251,8 @@
       <div id="authWelcomeBanner" class="bg-indigo-50/70 border border-indigo-100/80 p-5 rounded-2xl text-center space-y-1.5 transition-all duration-300">
         <p id="authWelcomeTitle" class="text-xs font-black text-slate-900 tracking-tight">Welcome to WorkFlowForge</p>
         <p class="text-[10px] text-slate-500 leading-relaxed font-medium">
-          Record spec documents, design nested sub-task checklists, link research assets, and track project payments and stages sequentially.
+          Record spec documents, design nested sub-task checklists, link research assets, and track project payments and stages securely.
         </p>
-      </div>
-
-      <!-- Auth Switch Tabs -->
-      <div class="flex border-b border-slate-100">
-        <button id="tabBtnEmail" class="flex-1 pb-2.5 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 transition">Email Account</button>
-        <button id="tabBtnToken" class="flex-1 pb-2.5 text-xs font-semibold text-slate-400 hover:text-slate-600 transition">Sandbox & Token</button>
       </div>
 
       <!-- Tab 1: Email Form -->
@@ -280,26 +271,6 @@
             <button id="btnRegisterEmail" type="button" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2 px-4 rounded-xl text-xs font-bold transition">Register</button>
           </div>
         </form>
-      </div>
-
-      <!-- Tab 2: Token / Sandbox Content -->
-      <div id="authTokenContent" class="space-y-4 hidden">
-        <div class="space-y-4">
-          <button id="anonymousLoginBtn" class="w-full bg-slate-900 hover:bg-black text-white py-2.5 px-4 rounded-xl text-xs font-bold shadow-sm transition flex items-center justify-center gap-2">
-            🚀 Quick Anonymous Sandbox
-          </button>
-          
-          <div class="relative flex py-1.5 items-center">
-            <div class="flex-grow border-t border-slate-200"></div>
-            <span class="flex-shrink mx-3 text-[9px] text-slate-400 font-bold uppercase tracking-wider">or sign in with secure token</span>
-            <div class="flex-grow border-t border-slate-200"></div>
-          </div>
-
-          <div class="space-y-2.5">
-            <input id="tokenInput" type="password" placeholder="Paste custom developer token key..." class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs py-2 px-3 text-slate-800 outline-none focus:border-indigo-500 transition" />
-            <button id="tokenLoginBtn" class="w-full bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 py-2 rounded-xl text-xs font-bold transition">Connect with Token</button>
-          </div>
-        </div>
       </div>
 
       <!-- Google Auth alternative divider & button -->
@@ -442,7 +413,7 @@
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 Sync Active
               </span>
-              <span id="sessionTypeBadge" class="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded uppercase">Sandbox</span>
+              <span id="sessionTypeBadge" class="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded uppercase">Cloud Auth</span>
             </div>
             <p class="text-[10px] text-slate-400 leading-normal overflow-hidden text-ellipsis" id="userPartitionDisplay">Partition Key: loading...</p>
             <button id="logoutBtn" type="button" class="w-full text-center py-1.5 text-[10px] font-bold text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200 transition">
@@ -1162,8 +1133,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { 
       getAuth, 
-      signInWithCustomToken, 
-      signInAnonymously, 
       signInWithEmailAndPassword,
       createUserWithEmailAndPassword,
       onAuthStateChanged,
@@ -1383,11 +1352,6 @@
       drawerAmountPaid: document.getElementById('drawerAmountPaid'),
       drawerBalance: document.getElementById('drawerBalance'),
 
-      // AI components (Retained for setup actions references)
-      aiGenerateMilestonesBtn: document.getElementById('aiGenerateMilestonesBtn'),
-      aiGenerateSpecBtn: document.getElementById('aiGenerateSpecBtn'),
-      aiLoadingIndicator: document.getElementById('aiLoadingIndicator'),
-
       // Lightbox elements
       lightboxModal: document.getElementById('lightboxModal'),
       lightboxImage: document.getElementById('lightboxImage'),
@@ -1405,13 +1369,10 @@
       cancelDeleteBtn: document.getElementById('cancelDeleteBtn'),
       confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
 
-      // Login Gateway switch triggers
-      tabBtnEmail: document.getElementById('tabBtnEmail'),
-      tabBtnToken: document.getElementById('tabBtnToken'),
-      authEmailContent: document.getElementById('authEmailContent'),
-      authTokenContent: document.getElementById('authTokenContent'),
+      // Login Gateway elements
       emailLoginForm: document.getElementById('emailLoginForm'),
       btnRegisterEmail: document.getElementById('btnRegisterEmail'),
+      googleLoginBtn: document.getElementById('googleLoginBtn'),
       authWelcomeBanner: document.getElementById('authWelcomeBanner'),
       authWelcomeTitle: document.getElementById('authWelcomeTitle'),
       authLogoWrapper: document.getElementById('authLogoWrapper')
@@ -1580,7 +1541,6 @@
     };
 
     const updateHeadTouchIconElements = (dataUrl) => {
-      // Update browser tab favicon link
       let faviconLink = document.querySelector("link[rel*='icon']");
       if (!faviconLink) {
         faviconLink = document.createElement('link');
@@ -1590,7 +1550,6 @@
       }
       faviconLink.href = dataUrl;
 
-      // Update apple-touch-icon link for iOS / Android bookmarks
       let appleIcon = document.querySelector("link[rel='apple-touch-icon']");
       if (!appleIcon) {
         appleIcon = document.createElement('link');
@@ -1615,15 +1574,13 @@
         };
         img.src = state.appIconCustomDataUrl;
       } else {
-        // Draw Gradient Background
         const gradColors = getHexColorsForGradient(state.appIconGradient);
-        const gradient = ctx.createLinearGradient(0, size, size, 0); // diagonal
+        const gradient = ctx.createLinearGradient(0, size, size, 0);
         gradient.addColorStop(0, gradColors[0]);
         gradient.addColorStop(1, gradColors[1]);
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, size, size);
 
-        // Draw Emoji Centered
         ctx.font = '100px Inter, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -1634,7 +1591,7 @@
       }
     };
 
-    // Custom App Icon Configurator implementation with Install modal preview integration
+    // Custom App Icon Configurator implementation
     const renderCustomBrandIcon = () => {
       const pwaModalIcon = document.getElementById('pwaModalIconPreview');
       const wrappers = [dom.brandIconWrapper, dom.authLogoWrapper, pwaModalIcon];
@@ -1650,7 +1607,7 @@
       });
 
       if (dom.customIconPreview) {
-        dom.customIconPreview.className = `w-16 h-16 rounded-2xl bg-gradient-to-tr ${state.appIconGradient} flex items-center justify-center shadow-lg shadow-indigo-500/10 text-3xl select-none text-white overflow-hidden`;
+        dom.customIconPreview.className = `w-16 h-16 rounded-2xl bg-gradient-to-tr ${state.appIconGradient} flex items-center justify-center shadow-lg shadow-indigo-500/10 text-3xl select-none text-white font-black overflow-hidden`;
         if (state.appIconCustomDataUrl) {
           dom.customIconPreview.innerHTML = `<img src="${state.appIconCustomDataUrl}" alt="App" class="w-full h-full object-cover">`;
         } else {
@@ -1658,34 +1615,41 @@
         }
       }
 
-      // Automatically generate canvas touch icon for browsers & devices on sync settings change
       generateTouchIconDataUrl();
     };
 
     // App Icon Modal toggles
-    dom.brandIconWrapper.addEventListener('click', () => {
-      dom.customIconEmojiInput.value = state.appIconEmoji;
-      dom.customIconFilename.textContent = state.appIconCustomDataUrl ? 'Custom uploaded file active' : 'No custom file';
-      dom.appIconModal.classList.remove('hidden');
-      dom.appIconModal.classList.add('flex');
-      renderCustomBrandIcon();
-    });
+    if (dom.brandIconWrapper) {
+      dom.brandIconWrapper.addEventListener('click', () => {
+        dom.customIconEmojiInput.value = state.appIconEmoji;
+        dom.customIconFilename.textContent = state.appIconCustomDataUrl ? 'Custom uploaded file active' : 'No custom file';
+        dom.appIconModal.classList.remove('hidden');
+        dom.appIconModal.classList.add('flex');
+        renderCustomBrandIcon();
+      });
+    }
 
-    dom.closeAppIconModalBtn.addEventListener('click', () => {
-      dom.appIconModal.classList.add('hidden');
-      dom.appIconModal.classList.remove('flex');
-    });
+    if (dom.closeAppIconModalBtn) {
+      dom.closeAppIconModalBtn.addEventListener('click', () => {
+        dom.appIconModal.classList.add('hidden');
+        dom.appIconModal.classList.remove('flex');
+      });
+    }
 
-    dom.cancelCustomIconBtn.addEventListener('click', () => {
-      dom.appIconModal.classList.add('hidden');
-      dom.appIconModal.classList.remove('flex');
-    });
+    if (dom.cancelCustomIconBtn) {
+      dom.cancelCustomIconBtn.addEventListener('click', () => {
+        dom.appIconModal.classList.add('hidden');
+        dom.appIconModal.classList.remove('flex');
+      });
+    }
 
-    dom.customIconEmojiInput.addEventListener('input', (e) => {
-      state.appIconEmoji = e.target.value || '⚡';
-      state.appIconCustomDataUrl = ''; // Reset custom image if they type emoji
-      renderCustomBrandIcon();
-    });
+    if (dom.customIconEmojiInput) {
+      dom.customIconEmojiInput.addEventListener('input', (e) => {
+        state.appIconEmoji = e.target.value || '⚡';
+        state.appIconCustomDataUrl = ''; // Reset custom image if they type emoji
+        renderCustomBrandIcon();
+      });
+    }
 
     document.querySelectorAll('.preset-emoji').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1710,57 +1674,63 @@
     });
 
     // Custom Icon Image file selection
-    dom.uploadCustomIconFileBtn.addEventListener('click', () => dom.appIconFileInput.click());
+    if (dom.uploadCustomIconFileBtn) {
+      dom.uploadCustomIconFileBtn.addEventListener('click', () => dom.appIconFileInput.click());
+    }
 
-    dom.appIconFileInput.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        dom.customIconFilename.textContent = "Compacting file...";
-        try {
-          // Compress to extremely small icon size (64x64)
-          const canvas = document.createElement('canvas');
-          canvas.width = 64;
-          canvas.height = 64;
-          const reader = new FileReader();
-          reader.onload = (fileEvent) => {
-            const img = new Image();
-            img.onload = () => {
-              const ctx = canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, 64, 64);
-              state.appIconCustomDataUrl = canvas.toDataURL('image/png');
-              dom.customIconFilename.textContent = file.name;
-              renderCustomBrandIcon();
+    if (dom.appIconFileInput) {
+      dom.appIconFileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          dom.customIconFilename.textContent = "Compacting file...";
+          try {
+            // Compress to extremely small icon size (64x64)
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const reader = new FileReader();
+            reader.onload = (fileEvent) => {
+              const img = new Image();
+              img.onload = () => {
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, 64, 64);
+                state.appIconCustomDataUrl = canvas.toDataURL('image/png');
+                dom.customIconFilename.textContent = file.name;
+                renderCustomBrandIcon();
+              };
+              img.src = fileEvent.target.result;
             };
-            img.src = fileEvent.target.result;
-          };
-          reader.readAsDataURL(file);
-        } catch (err) {
-          triggerToast("Failed to process custom app icon.", true);
+            reader.readAsDataURL(file);
+          } catch (err) {
+            triggerToast("Failed to process custom app icon.", true);
+          }
         }
-      }
-    });
+      });
+    }
 
     // Save Brand configuration dynamically to Firestore user settings collection
-    dom.saveCustomIconBtn.addEventListener('click', async () => {
-      if (!state.user) return;
-      try {
-        const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'profile', 'brandSettings');
-        await setDoc(docRef, {
-          emoji: state.appIconEmoji,
-          gradient: state.appIconGradient,
-          customDataUrl: state.appIconCustomDataUrl,
-          updatedAt: new Date().toISOString()
-        });
-        triggerToast("Brand updates synchronized across devices.");
-        dom.appIconModal.classList.add('hidden');
-        dom.appIconModal.classList.remove('flex');
-      } catch (err) {
-        console.error("Failed to sync settings:", err);
-        triggerToast("Saved locally to active browser window.");
-        dom.appIconModal.classList.add('hidden');
-        dom.appIconModal.classList.remove('flex');
-      }
-    });
+    if (dom.saveCustomIconBtn) {
+      dom.saveCustomIconBtn.addEventListener('click', async () => {
+        if (!state.user) return;
+        try {
+          const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'profile', 'brandSettings');
+          await setDoc(docRef, {
+            emoji: state.appIconEmoji,
+            gradient: state.appIconGradient,
+            customDataUrl: state.appIconCustomDataUrl,
+            updatedAt: new Date().toISOString()
+          });
+          triggerToast("Brand updates synchronized across devices.");
+          dom.appIconModal.classList.add('hidden');
+          dom.appIconModal.classList.remove('flex');
+        } catch (err) {
+          console.error("Failed to sync settings:", err);
+          triggerToast("Saved locally to active browser window.");
+          dom.appIconModal.classList.add('hidden');
+          dom.appIconModal.classList.remove('flex');
+        }
+      });
+    }
 
     // PWA Support prompt triggers with Direct Installation CTA link integration
     let deferredPrompt = null;
@@ -1770,6 +1740,9 @@
       if (dom.androidNativeInstallBtn) {
         dom.androidNativeInstallBtn.classList.remove('hidden');
       }
+      if (dom.pwaDirectInstallBtn) {
+        dom.pwaDirectInstallBtn.classList.remove('hidden');
+      }
     });
 
     // Listen for successful installed event
@@ -1778,30 +1751,38 @@
       deferredPrompt = null;
     });
 
-    dom.sidebarInstallBtn.addEventListener('click', () => {
-      dom.installAppModal.classList.remove('hidden');
-      dom.installAppModal.classList.add('flex');
-    });
+    if (dom.sidebarInstallBtn) {
+      dom.sidebarInstallBtn.addEventListener('click', () => {
+        dom.installAppModal.classList.remove('hidden');
+        dom.installAppModal.classList.add('flex');
+      });
+    }
 
-    dom.closeInstallAppModalBtn.addEventListener('click', () => {
-      dom.installAppModal.classList.add('hidden');
-      dom.installAppModal.classList.remove('flex');
-    });
+    if (dom.closeInstallAppModalBtn) {
+      dom.closeInstallAppModalBtn.addEventListener('click', () => {
+        dom.installAppModal.classList.add('hidden');
+        dom.installAppModal.classList.remove('flex');
+      });
+    }
 
     // Installation Tab Switch Logic
-    dom.tabInstallAndroid.addEventListener('click', () => {
-      dom.tabInstallAndroid.className = "flex-1 py-2 text-xs font-bold rounded-lg text-emerald-700 bg-white shadow-sm border border-slate-100 transition flex items-center justify-center gap-1.5";
-      dom.tabInstalliOS.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-600 transition flex items-center justify-center gap-1.5";
-      dom.installAndroidContent.classList.remove('hidden');
-      dom.installiOSContent.classList.add('hidden');
-    });
+    if (dom.tabInstallAndroid) {
+      dom.tabInstallAndroid.addEventListener('click', () => {
+        dom.tabInstallAndroid.className = "flex-1 py-2 text-xs font-bold rounded-lg text-emerald-700 bg-white shadow-sm border border-slate-100 transition flex items-center justify-center gap-1.5";
+        dom.tabInstalliOS.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-600 transition flex items-center justify-center gap-1.5";
+        dom.installAndroidContent.classList.remove('hidden');
+        dom.installiOSContent.classList.add('hidden');
+      });
+    }
 
-    dom.tabInstalliOS.addEventListener('click', () => {
-      dom.tabInstalliOS.className = "flex-1 py-2 text-xs font-bold rounded-lg text-emerald-700 bg-white shadow-sm border border-slate-100 transition flex items-center justify-center gap-1.5";
-      dom.tabInstallAndroid.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-600 transition flex items-center justify-center gap-1.5";
-      dom.installiOSContent.classList.remove('hidden');
-      dom.installAndroidContent.classList.add('hidden');
-    });
+    if (dom.tabInstalliOS) {
+      dom.tabInstalliOS.addEventListener('click', () => {
+        dom.tabInstalliOS.className = "flex-1 py-2 text-xs font-bold rounded-lg text-emerald-700 bg-white shadow-sm border border-slate-100 transition flex items-center justify-center gap-1.5";
+        dom.tabInstallAndroid.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-600 transition flex items-center justify-center gap-1.5";
+        dom.installiOSContent.classList.remove('hidden');
+        dom.installAndroidContent.classList.add('hidden');
+      });
+    }
 
     const triggerPwaInstallationWorkflow = async () => {
       if (deferredPrompt) {
@@ -1812,13 +1793,18 @@
         }
         deferredPrompt = null;
         if (dom.androidNativeInstallBtn) dom.androidNativeInstallBtn.classList.add('hidden');
+        if (dom.pwaDirectInstallBtn) dom.pwaDirectInstallBtn.classList.add('hidden');
       } else {
         triggerToast("Direct install is supported on compatible devices! Try your browser options menu and tap 'Add to Home Screen'.", false);
       }
     };
 
-    dom.androidNativeInstallBtn.addEventListener('click', triggerPwaInstallationWorkflow);
-    dom.pwaDirectInstallBtn.addEventListener('click', triggerPwaInstallationWorkflow);
+    if (dom.androidNativeInstallBtn) {
+      dom.androidNativeInstallBtn.addEventListener('click', triggerPwaInstallationWorkflow);
+    }
+    if (dom.pwaDirectInstallBtn) {
+      dom.pwaDirectInstallBtn.addEventListener('click', triggerPwaInstallationWorkflow);
+    }
 
     // Custom Delete dialog elements
     const confirmDeleteModalWrapper = (description) => {
@@ -1851,29 +1837,87 @@
       });
     };
 
-    // Custom Token Sync with Automatic Anonymous Fallback
-    const initWorkspaceAuth = async () => {
-      try {
-        if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) {
-          await signInWithCustomToken(auth, window.__initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
-        }
-      } catch (err) {
-        console.warn("Secure token sign-in failed. Initializing secure anonymous session:", err);
+    // Email / Password Login and Register Listeners
+    if (dom.emailLoginForm) {
+      dom.emailLoginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('authEmail').value.trim();
+        const password = document.getElementById('authPassword').value.trim();
+        if (!email || !password) return;
+
+        dom.authOverlay.classList.remove('flex');
+        dom.authOverlay.classList.add('hidden');
+        dom.loadingOverlay.classList.remove('hidden');
+
         try {
-          await signInAnonymously(auth);
-        } catch (anonErr) {
-          console.error("All auto-sync paths failed. Prompting workspace portal manually:", anonErr);
+          await signInWithEmailAndPassword(auth, email, password);
+          triggerToast("Successfully connected to workspace.");
+        } catch (err) {
+          console.error("Auth sign-in failed: ", err);
+          triggerToast("Login failed. Check your credentials.", true);
           dom.loadingOverlay.classList.add('hidden');
           dom.authOverlay.classList.remove('hidden');
           dom.authOverlay.classList.add('flex');
+        }
+      });
+    }
+
+    if (dom.btnRegisterEmail) {
+      dom.btnRegisterEmail.addEventListener('click', async () => {
+        const email = document.getElementById('authEmail').value.trim();
+        const password = document.getElementById('authPassword').value.trim();
+        if (!email || password.length < 6) {
+          triggerToast("Provide an email and a password of at least 6 characters.", true);
           return;
         }
-      }
 
+        dom.authOverlay.classList.remove('flex');
+        dom.authOverlay.classList.add('hidden');
+        dom.loadingOverlay.classList.remove('hidden');
+
+        try {
+          await createUserWithEmailAndPassword(auth, email, password);
+          triggerToast("Registered new pipeline workspace.");
+        } catch (err) {
+          console.error("Auth registration failed: ", err);
+          triggerToast("Registration failed: " + err.message, true);
+          dom.loadingOverlay.classList.add('hidden');
+          dom.authOverlay.classList.remove('hidden');
+          dom.authOverlay.classList.add('flex');
+        }
+      });
+    }
+
+    if (dom.googleLoginBtn) {
+      dom.googleLoginBtn.addEventListener('click', async () => {
+        dom.authOverlay.classList.remove('flex');
+        dom.authOverlay.classList.add('hidden');
+        dom.loadingOverlay.classList.remove('hidden');
+        try {
+          const provider = new GoogleAuthProvider();
+          await signInWithPopup(auth, provider);
+          triggerToast("Successfully signed in with Google!");
+        } catch (err) {
+          console.error("Google Auth failed: ", err);
+          if (err.code === 'auth/popup-blocked' || err.message?.includes('popup')) {
+            triggerToast("Popup blocked by browser. Please enable popups.", true);
+          } else {
+            triggerToast("Google sign-in failed. Please try again.", true);
+          }
+          dom.loadingOverlay.classList.add('hidden');
+          dom.authOverlay.classList.remove('hidden');
+          dom.authOverlay.classList.add('flex');
+        }
+      });
+    }
+
+    // Unified Clean Init Workflow
+    const initWorkspaceAuth = async () => {
       onAuthStateChanged(auth, (firebaseUser) => {
         if (firebaseUser) {
+          dom.authOverlay.classList.remove('flex');
+          dom.authOverlay.classList.add('hidden');
+          dom.loadingOverlay.classList.remove('hidden');
           setupSessionUserData(firebaseUser);
         } else {
           if (unsubWorkflows) unsubWorkflows();
@@ -1894,65 +1938,6 @@
         }
       });
     };
-
-    document.getElementById('anonymousLoginBtn').addEventListener('click', async () => {
-      dom.authOverlay.classList.remove('flex');
-      dom.authOverlay.classList.add('hidden');
-      dom.loadingOverlay.classList.remove('hidden');
-      try {
-        await signInAnonymously(auth);
-      } catch (err) {
-        console.warn("Live Authentication parameters unavailable. Starting local sandboxed session.");
-        triggerToast("Started local session mode.", true);
-        setupSessionUserData({
-          uid: 'sandboxed-innovator-uid',
-          isAnonymous: true,
-          displayName: 'Local Innovator'
-        });
-      }
-    });
-
-    document.getElementById('googleLoginBtn').addEventListener('click', async () => {
-      dom.authOverlay.classList.remove('flex');
-      dom.authOverlay.classList.add('hidden');
-      dom.loadingOverlay.classList.remove('hidden');
-      try {
-        const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
-        triggerToast("Successfully signed in with Google!");
-      } catch (err) {
-        console.error("Google Auth failed: ", err);
-        if (err.code === 'auth/popup-blocked' || err.message?.includes('popup')) {
-          triggerToast("Popup blocked by browser. Please enable popups or try token/sandbox mode.", true);
-        } else {
-          triggerToast("Google sign-in failed. Please try again.", true);
-        }
-        dom.loadingOverlay.classList.add('hidden');
-        dom.authOverlay.classList.remove('hidden');
-        dom.authOverlay.classList.add('flex');
-      }
-    });
-
-    document.getElementById('tokenLoginBtn').addEventListener('click', async () => {
-      const token = document.getElementById('tokenInput').value.trim();
-      if (!token) {
-        triggerToast("Please provide your token credential keys first.", true);
-        return;
-      }
-      dom.authOverlay.classList.remove('flex');
-      dom.authOverlay.classList.add('hidden');
-      dom.loadingOverlay.classList.remove('hidden');
-      try {
-        await signInWithCustomToken(auth, token);
-        triggerToast("Token synchronization established.");
-      } catch (err) {
-        console.error("Credentials verification failed.", err);
-        triggerToast("Access key expired or invalid.", true);
-        dom.loadingOverlay.classList.add('hidden');
-        dom.authOverlay.classList.remove('hidden');
-        dom.authOverlay.classList.add('flex');
-      }
-    });
 
     const setupSessionUserData = (firebaseUser) => {
       state.user = firebaseUser;
@@ -2008,19 +1993,21 @@
       syncWorkspaceCollections();
     };
 
-    dom.profileForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (!state.user) return;
-      const val = dom.usernameInput.value.trim();
-      if (!val) return;
-      state.customUsername = val;
-      dom.welcomeUser.textContent = val;
-      localStorage.setItem(`workflowforge_meta_${state.user.uid}`, JSON.stringify({
-        username: state.customUsername,
-        avatar: state.customAvatar
-      }));
-      triggerToast("Your profile updates were recorded.");
-    });
+    if (dom.profileForm) {
+      dom.profileForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!state.user) return;
+        const val = dom.usernameInput.value.trim();
+        if (!val) return;
+        state.customUsername = val;
+        dom.welcomeUser.textContent = val;
+        localStorage.setItem(`workflowforge_meta_${state.user.uid}`, JSON.stringify({
+          username: state.customUsername,
+          avatar: state.customAvatar
+        }));
+        triggerToast("Your profile updates were recorded.");
+      });
+    }
 
     document.querySelectorAll('.avatar-selector').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -2034,16 +2021,18 @@
       });
     });
 
-    dom.logoutBtn.addEventListener('click', async () => {
-      try {
-        await signOut(auth);
-      } catch (err) {
-        state.user = null;
-        dom.authOverlay.classList.remove('hidden');
-        dom.authOverlay.classList.add('flex');
-        triggerToast("Cleaned local credentials partition.");
-      }
-    });
+    if (dom.logoutBtn) {
+      dom.logoutBtn.addEventListener('click', async () => {
+        try {
+          await signOut(auth);
+        } catch (err) {
+          state.user = null;
+          dom.authOverlay.classList.remove('hidden');
+          dom.authOverlay.classList.add('flex');
+          triggerToast("Cleaned local credentials partition.");
+        }
+      });
+    }
 
     // Real-time Sync Integration with Auto-Seeding Engine (Rule 1 & 2)
     const syncWorkspaceCollections = () => {
@@ -2612,6 +2601,28 @@
 
       attachInlineActionListeners();
     };
+
+    // Binding directory reactive selectors
+    dom.workFilterSort.addEventListener('change', () => {
+      renderWorksDirectory();
+    });
+
+    dom.workFilterLifecycleState.addEventListener('change', () => {
+      renderWorksDirectory();
+    });
+
+    dom.workFilterPriority.addEventListener('change', () => {
+      renderWorksDirectory();
+    });
+
+    dom.resetFiltersBtn.addEventListener('click', () => {
+      dom.workSearchInput.value = '';
+      dom.workFilterCategory.value = 'All';
+      dom.workFilterPriority.value = 'All';
+      dom.workFilterLifecycleState.value = 'Active';
+      dom.workFilterSort.value = 'Newest';
+      renderWorksDirectory();
+    });
 
     // --- TAB 3: RENDER VISUAL KANBAN BOARD ---
     const renderKanbanBoard = () => {
