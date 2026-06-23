@@ -1564,6 +1564,76 @@
     registerMockDropzoneHandler('newWorkDropzone', 'newWorkFileInput', 'newWorkUploadFilename', 'newWorkImageUrl');
     registerMockDropzoneHandler('editWorkDropzone', 'editWorkFileInput', 'editWorkUploadFilename', 'editWorkImageUrl');
 
+    const getHexColorsForGradient = (gradientClass) => {
+      const presets = {
+        'from-indigo-600 to-indigo-400': ['#4f46e5', '#818cf8'],
+        'from-emerald-600 to-emerald-400': ['#059669', '#34d399'],
+        'from-purple-600 to-purple-400': ['#7c3aed', '#a78bfa'],
+        'from-rose-600 to-rose-400': ['#e11d48', '#fb7185'],
+        'from-amber-500 to-amber-300': ['#f59e0b', '#fcd34d'],
+        'from-slate-800 to-slate-600': ['#1e293b', '#475569']
+      };
+      for (const [key, value] of Object.entries(presets)) {
+        if (gradientClass.includes(key)) return value;
+      }
+      return ['#4f46e5', '#818cf8']; // fallback indigo
+    };
+
+    const updateHeadTouchIconElements = (dataUrl) => {
+      // Update browser tab favicon link
+      let faviconLink = document.querySelector("link[rel*='icon']");
+      if (!faviconLink) {
+        faviconLink = document.createElement('link');
+        faviconLink.rel = 'icon';
+        faviconLink.type = 'image/png';
+        document.head.appendChild(faviconLink);
+      }
+      faviconLink.href = dataUrl;
+
+      // Update apple-touch-icon link for iOS / Android bookmarks
+      let appleIcon = document.querySelector("link[rel='apple-touch-icon']");
+      if (!appleIcon) {
+        appleIcon = document.createElement('link');
+        appleIcon.rel = 'apple-touch-icon';
+        document.head.appendChild(appleIcon);
+      }
+      appleIcon.href = dataUrl;
+    };
+
+    const generateTouchIconDataUrl = () => {
+      const size = 180;
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      if (state.appIconCustomDataUrl) {
+        const img = new Image();
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0, size, size);
+          updateHeadTouchIconElements(canvas.toDataURL('image/png'));
+        };
+        img.src = state.appIconCustomDataUrl;
+      } else {
+        // Draw Gradient Background
+        const gradColors = getHexColorsForGradient(state.appIconGradient);
+        const gradient = ctx.createLinearGradient(0, size, size, 0); // diagonal
+        gradient.addColorStop(0, gradColors[0]);
+        gradient.addColorStop(1, gradColors[1]);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, size, size);
+
+        // Draw Emoji Centered
+        ctx.font = '100px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(state.appIconEmoji || '⚡', size / 2, size / 2 + 5);
+
+        updateHeadTouchIconElements(canvas.toDataURL('image/png'));
+      }
+    };
+
     // Custom App Icon Configurator implementation with Install modal preview integration
     const renderCustomBrandIcon = () => {
       const pwaModalIcon = document.getElementById('pwaModalIconPreview');
@@ -1587,6 +1657,9 @@
           dom.customIconPreview.innerHTML = state.appIconEmoji;
         }
       }
+
+      // Automatically generate canvas touch icon for browsers & devices on sync settings change
+      generateTouchIconDataUrl();
     };
 
     // App Icon Modal toggles
@@ -2540,28 +2613,6 @@
       attachInlineActionListeners();
     };
 
-    // Binding directory reactive selectors
-    dom.workFilterSort.addEventListener('change', () => {
-      renderWorksDirectory();
-    });
-
-    dom.workFilterLifecycleState.addEventListener('change', () => {
-      renderWorksDirectory();
-    });
-
-    dom.workFilterPriority.addEventListener('change', () => {
-      renderWorksDirectory();
-    });
-
-    dom.resetFiltersBtn.addEventListener('click', () => {
-      dom.workSearchInput.value = '';
-      dom.workFilterCategory.value = 'All';
-      dom.workFilterPriority.value = 'All';
-      dom.workFilterLifecycleState.value = 'Active';
-      dom.workFilterSort.value = 'Newest';
-      renderWorksDirectory();
-    });
-
     // --- TAB 3: RENDER VISUAL KANBAN BOARD ---
     const renderKanbanBoard = () => {
       if (!dom.kanbanBoardColumns) return;
@@ -2662,7 +2713,7 @@
                         </button>
                       ` : ''}
                       <button data-id="${work.id}" class="btn-inline-edit p-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 rounded transition" title="Edit Entry">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25(2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
                       </button>
                       <button data-id="${work.id}" class="btn-inline-delete p-1 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded transition" title="Delete Entry">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.109 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
