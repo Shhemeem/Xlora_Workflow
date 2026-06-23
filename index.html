@@ -17,7 +17,7 @@
     body {
       font-family: 'Inter', 'Noto Sans', sans-serif;
     }
-    /* Simple smooth transition utilities */
+    /* Smooth transition utilities */
     .tab-content {
       display: none;
     }
@@ -41,17 +41,17 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex items-center justify-center p-0 sm:p-4 md:p-6 lg:p-8 antialiased">
+<body class="bg-slate-100 text-slate-800 min-h-screen flex items-center justify-center p-0 sm:p-4 md:p-6 lg:p-8 antialiased relative">
 
   <!-- Toast Notification Wrapper -->
-  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-10 opacity-0 transition-all duration-300 flex items-center gap-3 bg-white border border-slate-200 text-slate-800 py-3.5 px-5 rounded-xl shadow-xl pointer-events-none">
+  <div id="toastNotification" class="fixed bottom-5 right-5 z-[9999] transform translate-y-10 opacity-0 transition-all duration-300 flex items-center gap-3 bg-white border border-slate-200 text-slate-800 py-3.5 px-5 rounded-xl shadow-xl pointer-events-none">
     <span id="toastColorIndicator" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
     <p id="toastMessage" class="text-sm font-semibold text-slate-700"></p>
   </div>
 
   <!-- Delete Confirmation Custom Modal -->
-  <div id="deleteModal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-sm overflow-hidden shadow-xl p-6 space-y-4">
+  <div id="deleteModal" class="fixed inset-0 z-[999] bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-sm overflow-hidden shadow-xl p-6 space-y-4 animate-scale-up">
       <div class="flex items-center gap-3 text-rose-600">
         <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
@@ -66,8 +66,161 @@
     </div>
   </div>
 
+  <!-- App Installation Modal (iOS & Android Installation guides) -->
+  <div id="installAppModal" class="fixed inset-0 z-[999] bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl p-6 space-y-6 animate-scale-up">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2 text-emerald-600">
+          <span class="text-2xl">📲</span>
+          <h3 class="text-base font-bold text-slate-900">Install WorkFlowForge</h3>
+        </div>
+        <button id="closeInstallAppModalBtn" class="text-slate-400 hover:text-slate-600 p-1.5 hover:bg-slate-100 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <!-- OS Tab Selectors -->
+      <div class="flex border-b border-slate-100 bg-slate-50/50 p-1 rounded-xl">
+        <button id="tabInstallAndroid" class="flex-1 py-2 text-xs font-bold rounded-lg text-emerald-700 bg-white shadow-sm border border-slate-100 transition flex items-center justify-center gap-1.5">
+          <span>🤖</span> Android
+        </button>
+        <button id="tabInstalliOS" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-600 transition flex items-center justify-center gap-1.5">
+          <span>🍏</span> iOS
+        </button>
+      </div>
+
+      <!-- Android Setup Guide -->
+      <div id="installAndroidContent" class="space-y-4">
+        <!-- Native Prompt trigger CTA -->
+        <button id="androidNativeInstallBtn" class="hidden w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-3 px-4 rounded-xl text-xs font-bold shadow-md shadow-emerald-500/10 transition duration-150 flex items-center justify-center gap-2">
+          🚀 Tap to Install Workspace App
+        </button>
+        <div class="text-xs text-slate-500 leading-relaxed space-y-2">
+          <p class="font-semibold text-slate-700">Manual Chrome Setup Instructions:</p>
+          <ol class="list-decimal pl-5 space-y-1.5 font-medium">
+            <li>Locate the <strong class="text-slate-800">Browser Options (three dots)</strong> menu in the upper-right corner.</li>
+            <li>Tap <strong class="text-slate-800">"Add to Home Screen"</strong> or <strong class="text-slate-800">"Install app"</strong>.</li>
+            <li>Confirm the prompt to access offline persistent caching.</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- iOS Setup Guide -->
+      <div id="installiOSContent" class="space-y-4 hidden">
+        <div class="text-xs text-slate-500 leading-relaxed space-y-3.5">
+          <p class="font-semibold text-slate-700">Safari Installation Guidelines:</p>
+          <div class="bg-indigo-50/50 border border-indigo-100/50 p-3.5 rounded-2xl flex items-start gap-3">
+            <span class="text-lg mt-0.5">📤</span>
+            <div>
+              <p class="font-bold text-slate-900 text-[11px]">1. Tap the Share button</p>
+              <p class="text-[10px] text-slate-500">Tap the Safari share icon located in your browser's toolbar.</p>
+            </div>
+          </div>
+          <div class="bg-indigo-50/50 border border-indigo-100/50 p-3.5 rounded-2xl flex items-start gap-3">
+            <span class="text-lg mt-0.5">➕</span>
+            <div>
+              <p class="font-bold text-slate-900 text-[11px]">2. Add to Home Screen</p>
+              <p class="text-[10px] text-slate-500">Scroll down and select the "Add to Home Screen" menu option.</p>
+            </div>
+          </div>
+          <div class="bg-indigo-50/50 border border-indigo-100/50 p-3.5 rounded-2xl flex items-start gap-3">
+            <span class="text-lg mt-0.5">✨</span>
+            <div>
+              <p class="font-bold text-slate-900 text-[11px]">3. Name and Save</p>
+              <p class="text-[10px] text-slate-500">Hit "Add" to save the App Icon directly onto your workspace grid.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom App Icon Customizer Modal -->
+  <div id="appIconModal" class="fixed inset-0 z-[999] bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl p-6 space-y-5 animate-scale-up">
+      <div class="flex justify-between items-center">
+        <h3 class="text-base font-bold text-slate-900">Custom Brand Icon</h3>
+        <button id="closeAppIconModalBtn" class="text-slate-400 hover:text-slate-600 p-1.5 hover:bg-slate-100 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="flex flex-col items-center gap-3 bg-slate-50 p-5 rounded-2xl border border-slate-200/50">
+        <!-- Dynamic Preview Icon -->
+        <div id="customIconPreview" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-indigo-500/10 text-3xl select-none text-white font-black">
+          ⚡
+        </div>
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Interactive Brand Preview</p>
+      </div>
+
+      <!-- Emoji Input Option -->
+      <div class="space-y-1.5">
+        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Select Brand Symbol / Emoji</label>
+        <div class="flex gap-2">
+          <input id="customIconEmojiInput" type="text" maxlength="2" value="⚡" class="w-12 bg-slate-50 border border-slate-200 rounded-xl text-center text-lg py-1.5 outline-none focus:border-indigo-500 transition" />
+          <!-- Preset quick-pick emojis -->
+          <div class="flex-1 flex gap-1.5 items-center overflow-x-auto bg-slate-50 p-1.5 rounded-xl border border-slate-200/50 select-none">
+            <button type="button" class="preset-emoji hover:scale-110 transition text-sm">⚡</button>
+            <button type="button" class="preset-emoji hover:scale-110 transition text-sm">🦊</button>
+            <button type="button" class="preset-emoji hover:scale-110 transition text-sm">🚀</button>
+            <button type="button" class="preset-emoji hover:scale-110 transition text-sm">🎨</button>
+            <button type="button" class="preset-emoji hover:scale-110 transition text-sm">💻</button>
+            <button type="button" class="preset-emoji hover:scale-110 transition text-sm">🍀</button>
+            <button type="button" class="preset-emoji hover:scale-110 transition text-sm">✨</button>
+            <button type="button" class="preset-emoji hover:scale-110 transition text-sm">⚙️</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gradient Presets -->
+      <div class="space-y-1.5">
+        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Brand Theme Gradient</label>
+        <div class="grid grid-cols-6 gap-2">
+          <button type="button" data-grad="from-indigo-600 to-indigo-400" class="gradient-picker-btn h-6 rounded-lg bg-gradient-to-tr from-indigo-600 to-indigo-400 border border-slate-300 ring-2 ring-indigo-500/20"></button>
+          <button type="button" data-grad="from-emerald-600 to-emerald-400" class="gradient-picker-btn h-6 rounded-lg bg-gradient-to-tr from-emerald-600 to-emerald-400 border border-slate-200"></button>
+          <button type="button" data-grad="from-purple-600 to-purple-400" class="gradient-picker-btn h-6 rounded-lg bg-gradient-to-tr from-purple-600 to-purple-400 border border-slate-200"></button>
+          <button type="button" data-grad="from-rose-600 to-rose-400" class="gradient-picker-btn h-6 rounded-lg bg-gradient-to-tr from-rose-600 to-rose-400 border border-slate-200"></button>
+          <button type="button" data-grad="from-amber-500 to-amber-300" class="gradient-picker-btn h-6 rounded-lg bg-gradient-to-tr from-amber-500 to-amber-300 border border-slate-200"></button>
+          <button type="button" data-grad="from-slate-800 to-slate-600" class="gradient-picker-btn h-6 rounded-lg bg-gradient-to-tr from-slate-800 to-slate-600 border border-slate-200"></button>
+        </div>
+      </div>
+
+      <!-- Tiny Image Upload Selector Option -->
+      <div class="space-y-1.5">
+        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Or Upload Custom Icon File</label>
+        <div class="flex items-center gap-3">
+          <button id="uploadCustomIconFileBtn" type="button" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold border border-slate-200 transition">Choose File...</button>
+          <span id="customIconFilename" class="text-[10px] text-slate-400 italic truncate max-w-[180px]">No file chosen</span>
+          <input id="appIconFileInput" type="file" accept="image/*" class="hidden">
+        </div>
+      </div>
+
+      <div class="flex gap-2.5 pt-2">
+        <button id="cancelCustomIconBtn" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-bold transition">Cancel</button>
+        <button id="saveCustomIconBtn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-xs font-bold shadow-md transition">Save Brand Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Image Lightbox Modal -->
+  <div id="lightboxModal" class="fixed inset-0 z-[9999] bg-slate-950/90 hidden items-center justify-center p-4">
+    <button id="closeLightboxBtn" class="absolute top-5 right-5 text-white bg-slate-800 hover:bg-slate-700 p-2.5 rounded-full border border-slate-700 transition">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <div class="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col items-center gap-3">
+      <img id="lightboxImage" src="" alt="Work Preview" class="max-w-full max-h-[75vh] object-contain rounded-xl border border-slate-800 shadow-2xl">
+      <p id="lightboxCaption" class="text-xs font-bold text-slate-300 text-center tracking-wide"></p>
+    </div>
+  </div>
+
   <!-- Loading State Panel -->
-  <div id="loadingOverlay" class="fixed inset-0 z-50 bg-slate-50 flex flex-col items-center justify-center p-6">
+  <div id="loadingOverlay" class="fixed inset-0 z-[9998] bg-slate-50 flex flex-col items-center justify-center p-6">
     <div class="relative flex items-center justify-center mb-6">
       <div class="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-indigo-600"></div>
       <span class="absolute text-lg">⚡</span>
@@ -77,13 +230,11 @@
   </div>
 
   <!-- Authentication Workspace Gateway -->
-  <div id="authOverlay" class="fixed inset-0 z-50 bg-slate-50 hidden items-center justify-center p-6 overflow-y-auto">
+  <div id="authOverlay" class="fixed inset-0 z-[9990] bg-slate-50 hidden items-center justify-center p-6 overflow-y-auto">
     <div class="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 shadow-xl space-y-6">
       <div class="text-center space-y-1">
-        <div class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-400 items-center justify-center shadow-md mb-2">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18M3 12h18M12 3l4 4M12 3L8 7M12 21l4-4m-4 4l-4-4" />
-          </svg>
+        <div id="authLogoWrapper" class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-400 items-center justify-center shadow-md mb-2 text-2xl text-white">
+          ⚡
         </div>
         <h1 class="text-xl font-black tracking-tight text-slate-900">WorkFlowForge Light</h1>
         <p class="text-xs text-indigo-600 font-bold uppercase tracking-wider">Secured Workspace Gateway</p>
@@ -157,7 +308,6 @@
         </svg>
         Sign In with Google
       </button>
-
     </div>
   </div>
 
@@ -166,17 +316,17 @@
 
     <!-- --- SIDEBAR NAVIGATION --- -->
     <aside class="w-full md:w-80 bg-white border-b md:border-b-0 md:border-r border-slate-200/80 p-6 flex flex-col justify-between shrink-0">
-      <div class="space-y-8">
+      <div class="space-y-6">
         <!-- Logo Header -->
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-md shadow-indigo-500/10">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18M3 12h18M12 3l4 4M12 3L8 7M12 21l4-4m-4 4l-4-4" />
-            </svg>
-          </div>
-          <div>
-            <h2 class="font-bold text-base leading-tight tracking-tight text-slate-900">WorkFlowForge</h2>
-            <p class="text-[10px] text-indigo-600 font-bold tracking-wider uppercase">Project Pipeline</p>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div id="brandIconWrapper" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-md shadow-indigo-500/10 cursor-pointer overflow-hidden transition-all duration-200 hover:scale-105" title="Customize App Icon">
+              <span id="brandIconDisplay" class="text-xl text-white">⚡</span>
+            </div>
+            <div>
+              <h2 class="font-bold text-base leading-tight tracking-tight text-slate-900">WorkFlowForge</h2>
+              <p class="text-[10px] text-indigo-600 font-bold tracking-wider uppercase">Project Pipeline</p>
+            </div>
           </div>
         </div>
 
@@ -194,6 +344,15 @@
             </svg>
           </button>
         </div>
+
+        <!-- App Installation Option -->
+        <button id="sidebarInstallBtn" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition duration-150 text-xs font-semibold text-emerald-600 hover:text-emerald-700 bg-emerald-50/60 hover:bg-emerald-50 border border-emerald-100/80">
+          <div class="flex items-center gap-3">
+            <span>📲</span>
+            <span>Install Web App</span>
+          </div>
+          <span class="text-[9px] bg-emerald-600 text-white font-black px-1.5 py-0.5 rounded-md uppercase">PWA</span>
+        </button>
 
         <!-- Tabs Menu List -->
         <nav class="space-y-1">
@@ -289,22 +448,22 @@
 
       <!-- --- TAB 1: DASHBOARD --- -->
       <div id="tab-dashboard" class="tab-content active space-y-8">
-        <!-- Welcome Banner -->
+        <!-- Welcome Banner with Live Time and Date -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 bg-white border border-slate-200 p-6 rounded-2xl shadow-sm relative overflow-hidden">
           <div class="space-y-1.5 relative z-10">
             <h1 class="text-xl md:text-2xl font-black text-slate-900">
               Welcome back, <span id="welcomeUser">Anonymous Creator</span>!
             </h1>
-            <p class="text-xs text-slate-500 max-w-lg leading-relaxed">
+            <p class="text-xs text-slate-500 max-w-lg leading-relaxed font-medium">
               Record spec documents, design nested sub-task checklists, link research assets, and track project payments and stages sequentially.
             </p>
           </div>
-          <button id="dashNewWorkBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-2.5 px-4 rounded-xl transition duration-150 shadow-md shadow-indigo-600/10 shrink-0 flex items-center gap-2 self-start md:self-center">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            New Work Project
-          </button>
+          
+          <!-- Live Local Time Segment -->
+          <div class="flex flex-col items-start md:items-end gap-1 shrink-0 bg-slate-50 border border-slate-100 p-4 rounded-xl">
+            <div id="dashboardLiveTime" class="text-lg md:text-xl font-black tracking-tight text-indigo-600 tabular-nums">00:00:00 AM</div>
+            <div id="dashboardLiveDate" class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Loading Calendar Date...</div>
+          </div>
         </div>
 
         <!-- Overview Stats Cards -->
@@ -345,15 +504,14 @@
 
         <!-- Dashboard Double Column -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          <!-- Left: Recently Modified works -->
+          <!-- Left: Recently Modified Active works -->
           <div class="lg:col-span-7 space-y-4">
             <div class="flex justify-between items-center">
               <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-                Recently Active Works
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                Active Works Workspace
               </h3>
-              <button data-goto-tab="works" class="text-xs text-indigo-600 hover:text-indigo-700 font-bold transition">View All Works &rarr;</button>
+              <button data-goto-tab="works" class="text-xs text-indigo-600 hover:text-indigo-700 font-bold transition">View Directory &rarr;</button>
             </div>
 
             <div id="dashboardRecentList" class="space-y-3">
@@ -361,21 +519,19 @@
             </div>
           </div>
 
-          <!-- Right: Active Pipelines -->
+          <!-- Right: Completed works -->
           <div class="lg:col-span-5 space-y-4">
             <div class="flex justify-between items-center">
               <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
-                Your Flow Templates
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                Recently Completed Pipeline Stages
               </h3>
-              <button data-goto-tab="pipelines" class="text-xs text-indigo-600 hover:text-indigo-700 font-bold transition">Configure &rarr;</button>
             </div>
 
-            <div id="dashboardPipelineList" class="space-y-3">
-              <!-- Dynamically populated -->
+            <div id="dashboardCompletedList" class="space-y-3">
+              <!-- Dynamically populated with finished items -->
             </div>
           </div>
-
         </div>
       </div>
 
@@ -394,14 +550,14 @@
           </button>
         </div>
 
-        <!-- Advanced Filter Row -->
-        <div class="bg-white border border-slate-200 p-4 rounded-xl grid grid-cols-1 md:grid-cols-4 gap-3 shadow-sm">
+        <!-- Advanced Filter Row with Active/Completed switches -->
+        <div class="bg-white border border-slate-200 p-4 rounded-xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 shadow-sm">
           <!-- Search input -->
           <div class="relative">
             <input
               id="workSearchInput"
               type="text"
-              placeholder="Search title, client, category..."
+              placeholder="Search title, client, shop, category..."
               class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg text-xs py-2 px-3 pl-8 text-slate-800 outline-none transition"
             />
             <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -420,10 +576,29 @@
           <div>
             <select id="workFilterPriority" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-lg text-xs py-2 px-3 text-slate-700 outline-none transition">
               <option value="All">All Priorities</option>
-              <option value="Critical">Critical Priority</option>
-              <option value="High">High Priority</option>
-              <option value="Medium">Medium Priority</option>
-              <option value="Low">Low Priority</option>
+              <option value="Critical">⚠️ Critical</option>
+              <option value="High">🟠 High Priority</option>
+              <option value="Medium">🔵 Medium Priority</option>
+              <option value="Low">⚪ Low Priority</option>
+            </select>
+          </div>
+
+          <!-- Sort Selector -->
+          <div>
+            <select id="workFilterSort" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-lg text-xs py-2 px-3 text-slate-700 outline-none transition">
+              <option value="Newest">Sort: Newest Added</option>
+              <option value="Category">Sort: Alphabetical Category</option>
+              <option value="BudgetHigh">Sort: Budget (High-Low)</option>
+              <option value="BudgetLow">Sort: Budget (Low-High)</option>
+            </select>
+          </div>
+
+          <!-- Stage Filter (Active vs Completed) -->
+          <div>
+            <select id="workFilterLifecycleState" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-lg text-xs py-2 px-3 text-slate-700 outline-none transition">
+              <option value="Active" selected>Lifecycle: Active Works Only</option>
+              <option value="Completed">Lifecycle: Closed & Completed</option>
+              <option value="All">Lifecycle: Show All Items</option>
             </select>
           </div>
 
@@ -502,13 +677,14 @@
           <div class="flex justify-between items-start gap-4">
             <div class="space-y-1">
               <div class="flex items-center gap-2 flex-wrap" id="drawerCompletedBadgeWrapper">
-                <!-- Pulsating green tick is dynamically prepended here when project reached completion stage -->
                 <span id="drawerCategoryBadge" class="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-100 text-indigo-700 border border-slate-200">Tag</span>
                 <span id="drawerPriorityBadge" class="text-[9px] font-bold tracking-wider px-2 py-0.5 rounded-full border">Priority</span>
                 <span id="drawerPaymentBadge" class="text-[9px] font-bold tracking-wider px-2 py-0.5 rounded-full border">Payment</span>
               </div>
               <h2 id="drawerTitle" class="text-xl font-black text-slate-900 mt-1">Project Spec Title</h2>
               <div id="drawerClientBox" class="text-xs text-slate-500 font-medium"></div>
+              <div id="drawerShopBox" class="text-xs font-bold text-slate-700"></div>
+              <div id="drawerDueDateBox" class="text-xs font-semibold text-rose-600 flex items-center gap-1.5"></div>
             </div>
             <button id="closeDrawerBtn" class="text-slate-400 hover:text-slate-600 p-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -547,12 +723,36 @@
             <p id="drawerDescDisplay" class="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200 leading-relaxed">Description Summary...</p>
           </div>
 
-          <!-- Dynamic Subtasks Checklists -->
-          <div class="space-y-3">
-            <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex justify-between items-center">
-              <span>Granular Checklist Tasks</span>
-              <span id="drawerChecklistMetric" class="text-indigo-600">0/0 Complete</span>
-            </h4>
+          <!-- Work File Image Viewer Section (Renders EXACTLY what was uploaded) -->
+          <div id="drawerImageContainer" class="space-y-2 hidden animate-fade-in">
+            <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Work File Attachment</h4>
+            <div class="relative group cursor-zoom-in rounded-xl border border-slate-200 overflow-hidden bg-slate-50 max-h-64 flex items-center justify-center shadow-sm">
+              <img id="drawerImageDisplay" src="" alt="Work Photo" class="w-full h-auto max-h-60 object-cover group-hover:scale-105 transition-transform duration-300">
+              <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition duration-200">
+                <span class="text-white text-xs font-bold bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-700">🔍 Click to View Fullscreen</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Subtasks Checklists with Reactive Milestone Search -->
+          <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200/80">
+            <div class="flex justify-between items-center flex-wrap gap-2">
+              <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span>📋 Milestones & Requirements Checklist</span>
+              </h4>
+              <span id="drawerChecklistMetric" class="text-xs bg-indigo-50 border border-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md font-bold">0/0 Complete</span>
+            </div>
+
+            <!-- Real-time Milestone Filter -->
+            <div class="relative">
+              <input
+                id="drawerMilestoneSearchInput"
+                type="text"
+                placeholder="Search checklist steps..."
+                class="w-full bg-white border border-slate-200 focus:border-indigo-500 rounded-lg text-xs py-1.5 px-3 pl-8 text-slate-800 outline-none transition"
+              />
+              <span class="absolute left-2.5 top-2 text-[10px]">🔍</span>
+            </div>
             
             <!-- Sub-task addition Form -->
             <div class="flex gap-2">
@@ -560,7 +760,7 @@
                 id="newSubtaskInput"
                 type="text"
                 placeholder="Add key step, requirements, asset link..."
-                class="flex-1 bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-lg text-xs py-2 px-3 text-slate-800 outline-none transition"
+                class="flex-1 bg-white border border-slate-200 focus:border-indigo-500 rounded-lg text-xs py-2 px-3 text-slate-800 outline-none transition"
               />
               <button id="addSubtaskBtn" class="bg-slate-800 hover:bg-slate-700 text-white px-3.5 rounded-lg text-xs font-bold border border-slate-700 transition">
                 Add Step
@@ -568,7 +768,7 @@
             </div>
 
             <!-- Checklist loop -->
-            <div id="drawerSubtaskList" class="space-y-1.5 max-h-[160px] overflow-y-auto">
+            <div id="drawerSubtaskList" class="space-y-1.5 max-h-[200px] overflow-y-auto">
               <!-- Dynamically populated checkboxes -->
             </div>
           </div>
@@ -597,7 +797,6 @@
             <div id="notesDisplayBox" class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 min-h-[100px] text-xs text-slate-600 whitespace-pre-wrap leading-relaxed">Scratchpad notes...</div>
             <textarea id="notesEditArea" rows="4" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition hidden" placeholder="Enter spec sheets, outlines, code architectures, links, references..."></textarea>
           </div>
-
         </div>
 
         <!-- Drawer footer modification tags -->
@@ -639,32 +838,57 @@
             <textarea id="newWorkDesc" placeholder="Provide a clear high-level target objective, specs, details..." rows="3" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition"></textarea>
           </div>
 
-          <!-- Client Details Fields -->
-          <div class="grid grid-cols-2 gap-4">
+          <!-- Client Details & Shop Metadata Fields -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Name</label>
               <input id="newWorkClientName" type="text" placeholder="e.g. Acme Corp" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Contact (Email/Phone)</label>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Shop Name</label>
+              <input id="newWorkShopName" type="text" placeholder="e.g. Acme Design Studio" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Contact (Email)</label>
               <input id="newWorkClientContact" type="text" placeholder="e.g. john@acme.com" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Category Tag</label>
               <input id="newWorkCategory" type="text" placeholder="e.g. Coding, Design, Copy" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
             </div>
 
             <div>
-              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Work Urgency / Priority</label>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Work Urgency</label>
               <select id="newWorkPriority" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3 text-slate-700 outline-none transition">
                 <option value="Critical">⚠️ Critical</option>
                 <option value="High">🟠 High Priority</option>
                 <option value="Medium" selected>🔵 Medium Priority</option>
                 <option value="Low">⚪ Low Priority</option>
               </select>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Due Date & Time</label>
+              <input id="newWorkDueDate" type="datetime-local" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2 px-3 text-slate-800 outline-none transition" />
+            </div>
+          </div>
+
+          <!-- Real Image Uploader Field (Guarantees exact image is loaded) -->
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Work File Photo / Diagram Attachment</label>
+            <div id="newWorkDropzone" class="border-2 border-dashed border-slate-200 hover:border-indigo-500 bg-slate-50 hover:bg-indigo-50/20 p-5 rounded-2xl transition duration-150 flex flex-col items-center justify-center cursor-pointer text-center relative gap-1.5">
+              <span class="text-2xl">📸</span>
+              <p class="text-xs font-bold text-slate-700">Click to upload workspace photo</p>
+              <p class="text-[9px] text-slate-400 font-medium">Supports PNG, JPG, WEBP (Autocompressed for Firestore)</p>
+              <p id="newWorkUploadFilename" class="text-[10px] text-indigo-600 font-bold hidden"></p>
+              <input id="newWorkFileInput" type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+            </div>
+            <div class="mt-2.5">
+              <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Or paste absolute Image URL</label>
+              <input id="newWorkImageUrl" type="url" placeholder="https://images.unsplash.com/photo-..." class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
             </div>
           </div>
 
@@ -740,32 +964,57 @@
             <textarea id="editWorkDesc" placeholder="Provide a clear high-level target objective, specs, details..." rows="3" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition"></textarea>
           </div>
 
-          <!-- Client Details Fields (Edit modal) -->
-          <div class="grid grid-cols-2 gap-4">
+          <!-- Client Details & Shop Metadata Fields -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Name</label>
               <input id="editWorkClientName" type="text" placeholder="e.g. Acme Corp" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
             </div>
             <div>
-              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Contact (Email/Phone)</label>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Shop Name</label>
+              <input id="editWorkShopName" type="text" placeholder="e.g. Acme Design Studio" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Contact (Email)</label>
               <input id="editWorkClientContact" type="text" placeholder="e.g. john@acme.com" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Category Tag</label>
               <input id="editWorkCategory" type="text" placeholder="e.g. Coding, Design, Copy" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
             </div>
 
             <div>
-              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Work Urgency / Priority</label>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Work Urgency</label>
               <select id="editWorkPriority" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3 text-slate-700 outline-none transition">
                 <option value="Critical">⚠️ Critical</option>
                 <option value="High">🟠 High Priority</option>
                 <option value="Medium">🔵 Medium Priority</option>
                 <option value="Low">⚪ Low Priority</option>
               </select>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Due Date & Time</label>
+              <input id="editWorkDueDate" type="datetime-local" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2 px-3 text-slate-800 outline-none transition" />
+            </div>
+          </div>
+
+          <!-- Real Image Uploader Field (Guarantees exact image is loaded) -->
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Work File Photo / Diagram Attachment</label>
+            <div id="editWorkDropzone" class="border-2 border-dashed border-slate-200 hover:border-indigo-500 bg-slate-50 hover:bg-indigo-50/20 p-5 rounded-2xl transition duration-150 flex flex-col items-center justify-center cursor-pointer text-center relative gap-1.5">
+              <span class="text-2xl">📸</span>
+              <p class="text-xs font-bold text-slate-700">Click to update workspace photo</p>
+              <p class="text-[9px] text-slate-400 font-medium">Supports PNG, JPG, WEBP (Autocompressed for Firestore)</p>
+              <p id="editWorkUploadFilename" class="text-[10px] text-indigo-600 font-bold hidden"></p>
+              <input id="editWorkFileInput" type="file" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+            </div>
+            <div class="mt-2.5">
+              <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Or paste absolute Image URL</label>
+              <input id="editWorkImageUrl" type="url" placeholder="https://images.unsplash.com/photo-..." class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
             </div>
           </div>
 
@@ -889,13 +1138,13 @@
 
   <!-- --- FIREBASE AND WORKSPACE MODULE SCRIPTS --- -->
   <script type="module">
-    // Suppress asynchronous Firebase loader failures and sandbox environment warnings gracefully
+    // Suppress asynchronous Firebase analytics rejection inside previews gracefully
     window.addEventListener('unhandledrejection', (event) => {
       if (event.reason && (
         (event.reason.code && event.reason.code.includes('analytics/')) ||
         (event.reason.message && event.reason.message.includes('Analytics'))
       )) {
-        event.preventDefault(); // Prevent page crashes and console boundary errors
+        event.preventDefault();
         console.warn("Firebase suppressed asynchronous load rejection inside preview container:", event.reason.message);
       }
     });
@@ -924,7 +1173,7 @@
       onSnapshot 
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- Global Setup & Fallback Configs (Updated with your custom Firebase keys) ---
+    // Global Setup & Safe Fallbacks with multi-account isolation checks
     const defaultFirebaseConfig = {
       apiKey: "AIzaSyArjOxYP1y0Trpu5FZjtdZiR4lRFoYLhw8",
       authDomain: "xlora-workflow.firebaseapp.com",
@@ -935,19 +1184,17 @@
       measurementId: "G-YGR0XBV55S"
     };
 
-    const firebaseConfig = typeof __firebase_config !== 'undefined' 
-      ? JSON.parse(__firebase_config) 
+    // Safely evaluate environment variables bound explicitly on window object
+    const firebaseConfig = typeof window.__firebase_config !== 'undefined' && window.__firebase_config
+      ? (typeof window.__firebase_config === 'string' ? JSON.parse(window.__firebase_config) : window.__firebase_config)
       : defaultFirebaseConfig;
 
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'workflowforge-app';
+    const appId = typeof window.__app_id !== 'undefined' && window.__app_id ? window.__app_id : 'default-app-id';
 
-    // Initialize Firebase Services safely (Analytics has been completely removed to avoid dynamic config errors inside sandboxes)
+    // Initialize Firebase Services safely
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-
-    // Initial Default Pipelines Setup - Presets removed as requested
-    const DEFAULT_WORKFLOWS = [];
 
     // --- UI State Management Engine ---
     const state = {
@@ -961,12 +1208,22 @@
       searchQuery: '',
       workFilterCategory: 'All',
       workFilterPriority: 'All',
+      workFilterLifecycleState: 'Active',
+      workFilterSort: 'Newest',
       selectedWorkId: null,
       isEditingNote: false,
       
       // Drafts state
-      draftPipelineStages: ['To Do', 'In Progress', 'Done'],
-      draftPipelineColor: 'blue'
+      draftPipelineStages: ['To Do', 'In Progress', 'Completed'],
+      draftPipelineColor: 'blue',
+
+      // Custom App Icon Config
+      appIconEmoji: '⚡',
+      appIconGradient: 'from-indigo-600 to-indigo-400',
+      appIconCustomDataUrl: '',
+
+      // Milestone filter drawer
+      milestoneSearchQuery: ''
     };
 
     // Callback listeners holders
@@ -985,28 +1242,55 @@
       userPartitionDisplay: document.getElementById('userPartitionDisplay'),
       sessionTypeBadge: document.getElementById('sessionTypeBadge'),
 
+      // Brand Icon Top Left displays
+      brandIconWrapper: document.getElementById('brandIconWrapper'),
+      brandIconDisplay: document.getElementById('brandIconDisplay'),
+
+      // App Icon Customizer modal elements
+      appIconModal: document.getElementById('appIconModal'),
+      closeAppIconModalBtn: document.getElementById('closeAppIconModalBtn'),
+      customIconPreview: document.getElementById('customIconPreview'),
+      customIconEmojiInput: document.getElementById('customIconEmojiInput'),
+      uploadCustomIconFileBtn: document.getElementById('uploadCustomIconFileBtn'),
+      customIconFilename: document.getElementById('customIconFilename'),
+      appIconFileInput: document.getElementById('appIconFileInput'),
+      cancelCustomIconBtn: document.getElementById('cancelCustomIconBtn'),
+      saveCustomIconBtn: document.getElementById('saveCustomIconBtn'),
+
+      // PWA installation modal trigger elements
+      installAppModal: document.getElementById('installAppModal'),
+      sidebarInstallBtn: document.getElementById('sidebarInstallBtn'),
+      closeInstallAppModalBtn: document.getElementById('closeInstallAppModalBtn'),
+      tabInstallAndroid: document.getElementById('tabInstallAndroid'),
+      tabInstalliOS: document.getElementById('tabInstalliOS'),
+      installAndroidContent: document.getElementById('installAndroidContent'),
+      installiOSContent: document.getElementById('installiOSContent'),
+      androidNativeInstallBtn: document.getElementById('androidNativeInstallBtn'),
+
       // Navigation Counts Badges
       dashboardCountBadge: document.getElementById('dashboardCountBadge'),
       pipelineCountBadge: document.getElementById('pipelineCountBadge'),
 
       // Stat cards metrics
       statTotalWorks: document.getElementById('statTotalWorks'),
-      statTotalSubtasks: document.getElementById('statTotalSubtasks'),
-      statTotalPipelines: document.getElementById('statTotalPipelines'),
-      statCriticalPriority: document.getElementById('statCriticalPriority'),
       statTotalBudget: document.getElementById('statTotalBudget'),
       statTotalPaid: document.getElementById('statTotalPaid'),
       statTotalUnpaid: document.getElementById('statTotalUnpaid'),
 
-      // Dashboard Views Lists
+      // Dashboard Views Lists & Live Clock
       dashboardRecentList: document.getElementById('dashboardRecentList'),
+      dashboardCompletedList: document.getElementById('dashboardCompletedList'),
       dashboardPipelineList: document.getElementById('dashboardPipelineList'),
+      dashboardLiveTime: document.getElementById('dashboardLiveTime'),
+      dashboardLiveDate: document.getElementById('dashboardLiveDate'),
 
       // Works Directory Filter elements
       worksGrid: document.getElementById('worksGrid'),
       workSearchInput: document.getElementById('workSearchInput'),
       workFilterCategory: document.getElementById('workFilterCategory'),
       workFilterPriority: document.getElementById('workFilterPriority'),
+      workFilterLifecycleState: document.getElementById('workFilterLifecycleState'),
+      workFilterSort: document.getElementById('workFilterSort'),
       resetFiltersBtn: document.getElementById('resetFiltersBtn'),
 
       // Kanban board views
@@ -1033,9 +1317,23 @@
       newPipelineStageInput: document.getElementById('newPipelineStageInput'),
       addStageToDraftBtn: document.getElementById('addStageToDraftBtn'),
 
+      // New metadata inputs
+      newWorkShopName: document.getElementById('newWorkShopName'),
+      newWorkDueDate: document.getElementById('newWorkDueDate'),
+      newWorkDropzone: document.getElementById('newWorkDropzone'),
+      newWorkFileInput: document.getElementById('newWorkFileInput'),
+      newWorkUploadFilename: document.getElementById('newWorkUploadFilename'),
+      newWorkImageUrl: document.getElementById('newWorkImageUrl'),
+
       // Edit dialog elements
       editWorkModal: document.getElementById('editWorkModal'),
       editWorkForm: document.getElementById('editWorkForm'),
+      editWorkShopName: document.getElementById('editWorkShopName'),
+      editWorkDueDate: document.getElementById('editWorkDueDate'),
+      editWorkDropzone: document.getElementById('editWorkDropzone'),
+      editWorkFileInput: document.getElementById('editWorkFileInput'),
+      editWorkUploadFilename: document.getElementById('editWorkUploadFilename'),
+      editWorkImageUrl: document.getElementById('editWorkImageUrl'),
 
       // Slide drawer components
       workDetailsDrawer: document.getElementById('workDetailsDrawer'),
@@ -1044,12 +1342,15 @@
       drawerPaymentBadge: document.getElementById('drawerPaymentBadge'),
       drawerTitle: document.getElementById('drawerTitle'),
       drawerClientBox: document.getElementById('drawerClientBox'),
+      drawerShopBox: document.getElementById('drawerShopBox'),
+      drawerDueDateBox: document.getElementById('drawerDueDateBox'),
       drawerDescDisplay: document.getElementById('drawerDescDisplay'),
       drawerStepperContainer: document.getElementById('drawerStepperContainer'),
       newSubtaskInput: document.getElementById('newSubtaskInput'),
       addSubtaskBtn: document.getElementById('addSubtaskBtn'),
       drawerSubtaskList: document.getElementById('drawerSubtaskList'),
       drawerChecklistMetric: document.getElementById('drawerChecklistMetric'),
+      drawerMilestoneSearchInput: document.getElementById('drawerMilestoneSearchInput'),
       notesDisplayBox: document.getElementById('notesDisplayBox'),
       notesEditArea: document.getElementById('notesEditArea'),
       editNotesBtn: document.getElementById('editNotesBtn'),
@@ -1063,9 +1364,23 @@
       drawerReferenceLink: document.getElementById('drawerReferenceLink'),
       copyReferenceUrlBtn: document.getElementById('copyReferenceUrlBtn'),
 
+      drawerImageContainer: document.getElementById('drawerImageContainer'),
+      drawerImageDisplay: document.getElementById('drawerImageDisplay'),
+
       drawerBudget: document.getElementById('drawerBudget'),
       drawerAmountPaid: document.getElementById('drawerAmountPaid'),
       drawerBalance: document.getElementById('drawerBalance'),
+
+      // AI components (Retained for setup actions references)
+      aiGenerateMilestonesBtn: document.getElementById('aiGenerateMilestonesBtn'),
+      aiGenerateSpecBtn: document.getElementById('aiGenerateSpecBtn'),
+      aiLoadingIndicator: document.getElementById('aiLoadingIndicator'),
+
+      // Lightbox elements
+      lightboxModal: document.getElementById('lightboxModal'),
+      lightboxImage: document.getElementById('lightboxImage'),
+      lightboxCaption: document.getElementById('lightboxCaption'),
+      closeLightboxBtn: document.getElementById('closeLightboxBtn'),
 
       // Custom toasts
       toastNotification: document.getElementById('toastNotification'),
@@ -1086,8 +1401,51 @@
       emailLoginForm: document.getElementById('emailLoginForm'),
       btnRegisterEmail: document.getElementById('btnRegisterEmail'),
       authWelcomeBanner: document.getElementById('authWelcomeBanner'),
-      authWelcomeTitle: document.getElementById('authWelcomeTitle')
+      authWelcomeTitle: document.getElementById('authWelcomeTitle'),
+      authLogoWrapper: document.getElementById('authLogoWrapper')
     };
+
+    // --- Dynamic Welcome Banner Update Helper ---
+    const updateAuthScreenWelcomeBanner = () => {
+      const lastEmail = localStorage.getItem('workflowforge_last_email');
+      if (dom.authWelcomeTitle && dom.authWelcomeBanner) {
+        if (lastEmail) {
+          dom.authWelcomeTitle.textContent = `Welcome back, ${lastEmail}!`;
+        } else {
+          dom.authWelcomeTitle.textContent = "Welcome to WorkFlowForge!";
+        }
+        dom.authWelcomeBanner.classList.remove('hidden');
+      }
+    };
+
+    // --- Toast Notifications Helper ---
+    const triggerToast = (message, isError = false) => {
+      if (!dom.toastNotification || !dom.toastMessage || !dom.toastColorIndicator) return;
+      dom.toastMessage.textContent = message;
+      dom.toastColorIndicator.className = `w-2.5 h-2.5 rounded-full ${isError ? 'bg-rose-500' : 'bg-emerald-500'}`;
+      
+      dom.toastNotification.classList.remove('translate-y-10', 'opacity-0', 'pointer-events-none');
+      dom.toastNotification.classList.add('translate-y-0', 'opacity-100');
+      
+      setTimeout(() => {
+        dom.toastNotification.classList.remove('translate-y-0', 'opacity-100');
+        dom.toastNotification.classList.add('translate-y-10', 'opacity-0', 'pointer-events-none');
+      }, 3500);
+    };
+
+    // --- Dynamic Clock Integration ---
+    const updateDashboardLiveClock = () => {
+      const now = new Date();
+      if (dom.dashboardLiveTime) {
+        dom.dashboardLiveTime.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      }
+      if (dom.dashboardLiveDate) {
+        const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+        dom.dashboardLiveDate.textContent = now.toLocaleDateString('en-US', options);
+      }
+    };
+    setInterval(updateDashboardLiveClock, 1000);
+    updateDashboardLiveClock();
 
     // --- Dynamic Payment Advance Visibility Switches ---
     const setupAdvancePaymentSwitch = (statusSelectId, standardContainerId, advanceContainerId, advanceInputId, standardInputId) => {
@@ -1096,6 +1454,8 @@
       const advanceContainer = document.getElementById(advanceContainerId);
       const advanceInput = document.getElementById(advanceInputId);
       const standardInput = document.getElementById(standardInputId);
+
+      if (!selectElem || !standardContainer || !advanceContainer || !advanceInput || !standardInput) return;
 
       selectElem.addEventListener('change', () => {
         if (selectElem.value === 'Advance Paid') {
@@ -1106,7 +1466,6 @@
           advanceContainer.classList.add('hidden');
           standardContainer.classList.remove('hidden');
           if (selectElem.value === 'Fully Paid') {
-            // Standardize full payment helper
             const budgetVal = document.getElementById(statusSelectId.replace('PaymentStatus', 'Budget')).value;
             standardInput.value = budgetVal || "0.00";
           } else if (selectElem.value === 'Unpaid') {
@@ -1119,17 +1478,265 @@
     setupAdvancePaymentSwitch('newWorkPaymentStatus', 'newWorkAmountPaidContainer', 'newWorkAdvancePaidContainer', 'newWorkAdvanceAmount', 'newWorkAmountPaid');
     setupAdvancePaymentSwitch('editWorkPaymentStatus', 'editWorkAmountPaidContainer', 'editWorkAdvancePaidContainer', 'editWorkAdvanceAmount', 'editWorkAmountPaid');
 
-    // --- Custom Confirm Modal Promise Utility ---
-    let pendingDeleteAction = null;
-    const confirmDeleteModal = (description) => {
+    // Universal Compressor to store the EXACT uploaded image inside Firestore (Under 1MB safely)
+    const compressAndGetImage = (file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 600; // Optimal width for high-fidelity thumbnails
+            const MAX_HEIGHT = 600;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > MAX_WIDTH) {
+                height *= MAX_WIDTH / width;
+                width = MAX_WIDTH;
+              }
+            } else {
+              if (height > MAX_HEIGHT) {
+                width *= MAX_HEIGHT / height;
+                height = MAX_HEIGHT;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Export compressed JPEG representation
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.65);
+            resolve(dataUrl);
+          };
+          img.onerror = () => reject(new Error("Failed to load image element source."));
+          img.src = e.target.result;
+        };
+        reader.onerror = () => reject(new Error("Failed to parse file array buffer."));
+        reader.readAsDataURL(file);
+      });
+    };
+
+    const registerMockDropzoneHandler = (dropzoneId, fileInputId, filenameId, urlInputId) => {
+      const dropzone = document.getElementById(dropzoneId);
+      const fileInput = document.getElementById(fileInputId);
+      const filenameLabel = document.getElementById(filenameId);
+      const urlInput = document.getElementById(urlInputId);
+
+      if (!dropzone || !fileInput || !filenameLabel || !urlInput) return;
+
+      dropzone.addEventListener('click', () => fileInput.click());
+
+      fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          filenameLabel.textContent = `Processing image file...`;
+          filenameLabel.classList.remove('hidden');
+          try {
+            const dataUrl = await compressAndGetImage(file);
+            urlInput.value = dataUrl;
+            filenameLabel.textContent = `Loaded Exact Upload: ${file.name}`;
+            triggerToast(`Exact image processed successfully!`);
+          } catch (err) {
+            console.error("Compression failed:", err);
+            filenameLabel.textContent = `Upload failed: ${file.name}`;
+            triggerToast("Failed to process attachment. Verify file format.", true);
+          }
+        }
+      });
+    };
+
+    registerMockDropzoneHandler('newWorkDropzone', 'newWorkFileInput', 'newWorkUploadFilename', 'newWorkImageUrl');
+    registerMockDropzoneHandler('editWorkDropzone', 'editWorkFileInput', 'editWorkUploadFilename', 'editWorkImageUrl');
+
+    // Custom App Icon Configurator implementation
+    const renderCustomBrandIcon = () => {
+      const wrappers = [dom.brandIconWrapper, dom.authLogoWrapper];
+      const displays = [dom.brandIconDisplay];
+
+      wrappers.forEach(wrap => {
+        if (!wrap) return;
+        wrap.className = `w-10 h-10 rounded-xl bg-gradient-to-tr ${state.appIconGradient} flex items-center justify-center shadow-md shadow-indigo-500/10 cursor-pointer overflow-hidden transition-all duration-200 hover:scale-105`;
+        if (state.appIconCustomDataUrl) {
+          wrap.innerHTML = `<img src="${state.appIconCustomDataUrl}" alt="App" class="w-full h-full object-cover">`;
+        } else {
+          wrap.innerHTML = `<span class="text-xl text-white select-none">${state.appIconEmoji}</span>`;
+        }
+      });
+
+      if (dom.customIconPreview) {
+        dom.customIconPreview.className = `w-16 h-16 rounded-2xl bg-gradient-to-tr ${state.appIconGradient} flex items-center justify-center shadow-lg shadow-indigo-500/10 text-3xl select-none text-white overflow-hidden`;
+        if (state.appIconCustomDataUrl) {
+          dom.customIconPreview.innerHTML = `<img src="${state.appIconCustomDataUrl}" alt="App" class="w-full h-full object-cover">`;
+        } else {
+          dom.customIconPreview.innerHTML = state.appIconEmoji;
+        }
+      }
+    };
+
+    // App Icon Modal toggles
+    dom.brandIconWrapper.addEventListener('click', () => {
+      dom.customIconEmojiInput.value = state.appIconEmoji;
+      dom.customIconFilename.textContent = state.appIconCustomDataUrl ? 'Custom uploaded file active' : 'No custom file';
+      dom.appIconModal.classList.remove('hidden');
+      dom.appIconModal.classList.add('flex');
+      renderCustomBrandIcon();
+    });
+
+    dom.closeAppIconModalBtn.addEventListener('click', () => {
+      dom.appIconModal.classList.add('hidden');
+      dom.appIconModal.classList.remove('flex');
+    });
+
+    dom.cancelCustomIconBtn.addEventListener('click', () => {
+      dom.appIconModal.classList.add('hidden');
+      dom.appIconModal.classList.remove('flex');
+    });
+
+    dom.customIconEmojiInput.addEventListener('input', (e) => {
+      state.appIconEmoji = e.target.value || '⚡';
+      state.appIconCustomDataUrl = ''; // Reset custom image if they type emoji
+      renderCustomBrandIcon();
+    });
+
+    document.querySelectorAll('.preset-emoji').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.appIconEmoji = btn.textContent;
+        dom.customIconEmojiInput.value = btn.textContent;
+        state.appIconCustomDataUrl = ''; // Reset custom image if they type emoji
+        renderCustomBrandIcon();
+      });
+    });
+
+    document.querySelectorAll('.gradient-picker-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.appIconGradient = btn.dataset.grad;
+        document.querySelectorAll('.gradient-picker-btn').forEach(b => {
+          b.classList.remove('ring-2', 'ring-indigo-500/20', 'border-slate-300');
+          b.classList.add('border-slate-200');
+        });
+        btn.classList.add('ring-2', 'ring-indigo-500/20', 'border-slate-300');
+        btn.classList.remove('border-slate-200');
+        renderCustomBrandIcon();
+      });
+    });
+
+    // Custom Icon Image file selection
+    dom.uploadCustomIconFileBtn.addEventListener('click', () => dom.appIconFileInput.click());
+
+    dom.appIconFileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        dom.customIconFilename.textContent = "Compacting file...";
+        try {
+          // Compress to extremely small icon size (64x64)
+          const canvas = document.createElement('canvas');
+          canvas.width = 64;
+          canvas.height = 64;
+          const reader = new FileReader();
+          reader.onload = (fileEvent) => {
+            const img = new Image();
+            img.onload = () => {
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, 64, 64);
+              state.appIconCustomDataUrl = canvas.toDataURL('image/png');
+              dom.customIconFilename.textContent = file.name;
+              renderCustomBrandIcon();
+            };
+            img.src = fileEvent.target.result;
+          };
+          reader.readAsDataURL(file);
+        } catch (err) {
+          triggerToast("Failed to process custom app icon.", true);
+        }
+      }
+    });
+
+    // Save Brand configuration dynamically to Firestore user settings collection
+    dom.saveCustomIconBtn.addEventListener('click', async () => {
+      if (!state.user) return;
+      try {
+        const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'profile', 'brandSettings');
+        await setDoc(docRef, {
+          emoji: state.appIconEmoji,
+          gradient: state.appIconGradient,
+          customDataUrl: state.appIconCustomDataUrl,
+          updatedAt: new Date().toISOString()
+        });
+        triggerToast("Brand updates synchronized across devices.");
+        dom.appIconModal.classList.add('hidden');
+        dom.appIconModal.classList.remove('flex');
+      } catch (err) {
+        console.error("Failed to sync settings:", err);
+        triggerToast("Saved locally to active browser window.");
+        dom.appIconModal.classList.add('hidden');
+        dom.appIconModal.classList.remove('flex');
+      }
+    });
+
+    // PWA Support prompt triggers
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (dom.androidNativeInstallBtn) {
+        dom.androidNativeInstallBtn.classList.remove('hidden');
+      }
+    });
+
+    dom.sidebarInstallBtn.addEventListener('click', () => {
+      dom.installAppModal.classList.remove('hidden');
+      dom.installAppModal.classList.add('flex');
+    });
+
+    dom.closeInstallAppModalBtn.addEventListener('click', () => {
+      dom.installAppModal.classList.add('hidden');
+      dom.installAppModal.classList.remove('flex');
+    });
+
+    // Installation Tab Switch Logic
+    dom.tabInstallAndroid.addEventListener('click', () => {
+      dom.tabInstallAndroid.className = "flex-1 py-2 text-xs font-bold rounded-lg text-emerald-700 bg-white shadow-sm border border-slate-100 transition flex items-center justify-center gap-1.5";
+      dom.tabInstalliOS.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-600 transition flex items-center justify-center gap-1.5";
+      dom.installAndroidContent.classList.remove('hidden');
+      dom.installiOSContent.classList.add('hidden');
+    });
+
+    dom.tabInstalliOS.addEventListener('click', () => {
+      dom.tabInstalliOS.className = "flex-1 py-2 text-xs font-bold rounded-lg text-emerald-700 bg-white shadow-sm border border-slate-100 transition flex items-center justify-center gap-1.5";
+      dom.tabInstallAndroid.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-600 transition flex items-center justify-center gap-1.5";
+      dom.installiOSContent.classList.remove('hidden');
+      dom.installAndroidContent.classList.add('hidden');
+    });
+
+    dom.androidNativeInstallBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          triggerToast("Thank you for installing WorkFlowForge!");
+        }
+        deferredPrompt = null;
+        dom.androidNativeInstallBtn.classList.add('hidden');
+      }
+    });
+
+    // Custom Delete dialog elements
+    const confirmDeleteModalWrapper = (description) => {
       return new Promise((resolve) => {
+        if (!dom.deleteModalDescription || !dom.deleteModal || !dom.confirmDeleteBtn || !dom.cancelDeleteBtn) {
+          resolve(false);
+          return;
+        }
         dom.deleteModalDescription.textContent = description;
         dom.deleteModal.classList.remove('hidden');
         
         const clearListeners = () => {
           dom.confirmDeleteBtn.replaceWith(dom.confirmDeleteBtn.cloneNode(true));
           dom.cancelDeleteBtn.replaceWith(dom.cancelDeleteBtn.cloneNode(true));
-          // Recache references
           dom.confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
           dom.cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
         };
@@ -1148,108 +1755,48 @@
       });
     };
 
-    // --- Toast Notifications Helper ---
-    const triggerToast = (message, isError = false) => {
-      dom.toastMessage.textContent = message;
-      dom.toastColorIndicator.className = `w-2.5 h-2.5 rounded-full ${isError ? 'bg-rose-500' : 'bg-emerald-500'}`;
-      
-      dom.toastNotification.classList.remove('translate-y-10', 'opacity-0');
-      dom.toastNotification.classList.add('translate-y-0', 'opacity-100');
-      
-      setTimeout(() => {
-        dom.toastNotification.classList.remove('translate-y-0', 'opacity-100');
-        dom.toastNotification.classList.add('translate-y-10', 'opacity-0');
-      }, 3500);
-    };
-
-    // --- Dynamic Welcome Banner Update Helper ---
-    const updateAuthScreenWelcomeBanner = () => {
-      const lastEmail = localStorage.getItem('workflowforge_last_email');
-      if (dom.authWelcomeTitle && dom.authWelcomeBanner) {
-        if (lastEmail) {
-          dom.authWelcomeTitle.textContent = `Welcome back, ${lastEmail}!`;
-        } else {
-          dom.authWelcomeTitle.textContent = "Welcome to WorkFlowForge!";
-        }
-        dom.authWelcomeBanner.classList.remove('hidden');
-      }
-    };
-
-    // --- Setup Login UI Tabs toggles ---
-    dom.tabBtnEmail.addEventListener('click', () => {
-      dom.tabBtnEmail.className = "flex-1 pb-2.5 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 transition";
-      dom.tabBtnToken.className = "flex-1 pb-2.5 text-xs font-semibold text-slate-400 hover:text-slate-600 transition";
-      dom.authEmailContent.classList.remove('hidden');
-      dom.authTokenContent.classList.add('hidden');
-    });
-
-    dom.tabBtnToken.addEventListener('click', () => {
-      dom.tabBtnToken.className = "flex-1 pb-2.5 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 transition";
-      dom.tabBtnEmail.className = "flex-1 pb-2.5 text-xs font-semibold text-slate-400 hover:text-slate-600 transition";
-      dom.authTokenContent.classList.remove('hidden');
-      dom.authEmailContent.classList.add('hidden');
-    });
-
-    // Email / Password Login and Register Listeners
-    dom.emailLoginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('authEmail').value.trim();
-      const password = document.getElementById('authPassword').value.trim();
-      if (!email || !password) return;
-
-      dom.authOverlay.classList.remove('flex');
-      dom.authOverlay.classList.add('hidden');
-      dom.loadingOverlay.classList.remove('hidden');
-
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        triggerToast("Successfully connected to workspace.");
-      } catch (err) {
-        console.error("Auth sign-in failed: ", err);
-        triggerToast("Login failed. Check your credentials.", true);
-        dom.loadingOverlay.classList.add('hidden');
-        dom.authOverlay.classList.remove('hidden');
-        dom.authOverlay.classList.add('flex');
-      }
-    });
-
-    dom.btnRegisterEmail.addEventListener('click', async () => {
-      const email = document.getElementById('authEmail').value.trim();
-      const password = document.getElementById('authPassword').value.trim();
-      if (!email || password.length < 6) {
-        triggerToast("Provide an email and a password of at least 6 characters.", true);
-        return;
-      }
-
-      dom.authOverlay.classList.remove('flex');
-      dom.authOverlay.classList.add('hidden');
-      dom.loadingOverlay.classList.remove('hidden');
-
-      try {
-        await createUserWithEmailAndPassword(auth, email, password);
-        triggerToast("Registered new pipeline workspace.");
-      } catch (err) {
-        console.error("Auth registration failed: ", err);
-        triggerToast("Registration failed: " + err.message, true);
-        dom.loadingOverlay.classList.add('hidden');
-        dom.authOverlay.classList.remove('hidden');
-        dom.authOverlay.classList.add('flex');
-      }
-    });
-
+    // Custom Token Sync with Automatic Anonymous Fallback
     const initWorkspaceAuth = async () => {
       try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
+        if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) {
+          await signInWithCustomToken(auth, window.__initial_auth_token);
         } else {
-          // Fallback trigger prompts
+          await signInAnonymously(auth);
         }
       } catch (err) {
-        console.warn("Secure token sign-in rejected. Prompting login interface.", err);
-        dom.loadingOverlay.classList.add('hidden');
-        dom.authOverlay.classList.remove('hidden');
-        dom.authOverlay.classList.add('flex');
+        console.warn("Secure token sign-in failed. Initializing secure anonymous session:", err);
+        try {
+          await signInAnonymously(auth);
+        } catch (anonErr) {
+          console.error("All auto-sync paths failed. Prompting workspace portal manually:", anonErr);
+          dom.loadingOverlay.classList.add('hidden');
+          dom.authOverlay.classList.remove('hidden');
+          dom.authOverlay.classList.add('flex');
+          return;
+        }
       }
+
+      onAuthStateChanged(auth, (firebaseUser) => {
+        if (firebaseUser) {
+          setupSessionUserData(firebaseUser);
+        } else {
+          if (unsubWorkflows) unsubWorkflows();
+          if (unsubWorks) unsubWorks();
+          
+          state.user = null;
+          state.works = [];
+          state.workflows = [];
+          state.selectedWorkId = null;
+          state.isEditingNote = false;
+          
+          updateAppView();
+          updateAuthScreenWelcomeBanner();
+
+          dom.loadingOverlay.classList.add('hidden');
+          dom.authOverlay.classList.remove('hidden');
+          dom.authOverlay.classList.add('flex');
+        }
+      });
     };
 
     document.getElementById('anonymousLoginBtn').addEventListener('click', async () => {
@@ -1279,7 +1826,6 @@
         triggerToast("Successfully signed in with Google!");
       } catch (err) {
         console.error("Google Auth failed: ", err);
-        // Handle iframe/sandbox popup blocks graciously
         if (err.code === 'auth/popup-blocked' || err.message?.includes('popup')) {
           triggerToast("Popup blocked by browser. Please enable popups or try token/sandbox mode.", true);
         } else {
@@ -1312,29 +1858,6 @@
       }
     });
 
-    onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        setupSessionUserData(firebaseUser);
-      } else {
-        if (unsubWorkflows) unsubWorkflows();
-        if (unsubWorks) unsubWorks();
-        
-        // Dynamic Isolation Clearance: Empty internal collections completely
-        state.user = null;
-        state.works = [];
-        state.workflows = [];
-        state.selectedWorkId = null;
-        state.isEditingNote = false;
-        
-        updateAppView(); // Redraw system UI visually clear
-        updateAuthScreenWelcomeBanner(); // Safely refresh landing details
-
-        dom.loadingOverlay.classList.add('hidden');
-        dom.authOverlay.classList.remove('hidden');
-        dom.authOverlay.classList.add('flex');
-      }
-    });
-
     const setupSessionUserData = (firebaseUser) => {
       state.user = firebaseUser;
       
@@ -1344,7 +1867,6 @@
         state.customUsername = parsed.username || 'Anonymous Innovator';
         state.customAvatar = parsed.avatar || '🦊';
       } else {
-        // Fallback checks slice at @ for clean greeting text display
         let greetingName = firebaseUser.displayName || firebaseUser.email || 'Pioneering Creator';
         if (greetingName.includes('@')) {
           greetingName = greetingName.split('@')[0];
@@ -1353,7 +1875,6 @@
         state.customAvatar = '🦊';
       }
 
-      // Save credentials session fallback values
       if (firebaseUser.email) {
         localStorage.setItem('workflowforge_last_email', firebaseUser.email);
       } else if (firebaseUser.isAnonymous) {
@@ -1372,6 +1893,20 @@
         } else {
           btn.classList.remove('bg-white', 'border-slate-200', 'shadow-sm');
         }
+      });
+
+      // Synchronize brand settings if present on DB
+      const brandDoc = doc(db, 'artifacts', appId, 'users', firebaseUser.uid, 'profile', 'brandSettings');
+      onSnapshot(brandDoc, (settingsSnap) => {
+        if (settingsSnap.exists()) {
+          const dat = settingsSnap.data();
+          state.appIconEmoji = dat.emoji || '⚡';
+          state.appIconGradient = dat.gradient || 'from-indigo-600 to-indigo-400';
+          state.appIconCustomDataUrl = dat.customDataUrl || '';
+          renderCustomBrandIcon();
+        }
+      }, (err) => {
+        console.warn("Using offline fallback app brand settings.");
       });
 
       syncWorkspaceCollections();
@@ -1414,7 +1949,7 @@
       }
     });
 
-    // --- Clean Real-time Firestore Sync Integration (Rule 1, 2, 3) ---
+    // Real-time Sync Integration with Auto-Seeding Engine (Rule 1 & 2)
     const syncWorkspaceCollections = () => {
       if (!state.user) return;
 
@@ -1423,13 +1958,30 @@
 
       // 1. Sync pipelines
       const flowCol = collection(db, 'artifacts', appId, 'users', state.user.uid, 'workflows');
-      unsubWorkflows = onSnapshot(flowCol, (snap) => {
+      unsubWorkflows = onSnapshot(flowCol, async (snap) => {
         const temp = [];
         snap.forEach(docSnap => {
           temp.push({ id: docSnap.id, ...docSnap.data() });
         });
 
-        // Preset templates completely removed. Initial blank template list handles gracefully.
+        // Seed default Standard Pipeline if empty so users can seamlessly create work pieces immediately
+        if (temp.length === 0) {
+          const defaultWfId = 'wf-simple-preset';
+          const defaultWf = {
+            id: defaultWfId,
+            name: 'Standard Pipeline',
+            stages: ['To Do', 'In Progress', 'Completed'],
+            color: 'indigo'
+          };
+          try {
+            const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'workflows', defaultWfId);
+            await setDoc(docRef, defaultWf);
+          } catch (err) {
+            console.error("Auto-seeding default pipeline failed:", err);
+          }
+          return;
+        }
+
         state.workflows = temp;
 
         if (state.workflows.length > 0 && !state.boardWorkflowFilter) {
@@ -1438,7 +1990,7 @@
 
         updateAppView();
       }, (err) => {
-        console.warn("Pipelines sync read failed.");
+        console.warn("Pipelines sync read failed:", err);
         state.workflows = [];
         updateAppView();
       });
@@ -1454,7 +2006,7 @@
         updateAppView();
         dom.loadingOverlay.classList.add('hidden');
       }, (err) => {
-        console.warn("Works partition read failed.");
+        console.warn("Works partition read failed:", err);
         state.works = [];
         updateAppView();
         dom.loadingOverlay.classList.add('hidden');
@@ -1473,11 +2025,12 @@
     };
 
     const renderCountBadges = () => {
-      dom.dashboardCountBadge.textContent = state.works.length;
-      dom.pipelineCountBadge.textContent = state.workflows.length;
+      if (dom.dashboardCountBadge) dom.dashboardCountBadge.textContent = state.works.length;
+      if (dom.pipelineCountBadge) dom.pipelineCountBadge.textContent = state.workflows.length;
     };
 
     const populateDropdowns = () => {
+      if (!dom.newWorkWorkflowId || !dom.boardPipelineSelector) return;
       const oldVal = dom.newWorkWorkflowId.value;
       if (state.workflows.length === 0) {
         dom.newWorkWorkflowId.innerHTML = `<option value="">-- Configure a Pipeline First --</option>`;
@@ -1501,7 +2054,6 @@
         }
       }
 
-      const oldBoardFilter = dom.boardPipelineSelector.value;
       dom.boardPipelineSelector.innerHTML = state.workflows.map(wf => `
         <option value="${wf.id}" ${wf.id === state.boardWorkflowFilter ? 'selected' : ''}>${wf.name}</option>
       `).join('');
@@ -1542,7 +2094,6 @@
       return isNaN(parsed) ? '$0.00' : '$' + parsed.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
     };
 
-    // --- HELPER TO CHECK IF PROJECT COMPLETED ITS LIFECYCLE ---
     const isProjectLifecycleCompleted = (work) => {
       const matchedWf = state.workflows.find(w => w.id === work.workflowId);
       if (!matchedWf || !matchedWf.stages || matchedWf.stages.length === 0) return false;
@@ -1564,6 +2115,14 @@
       return '';
     };
 
+    // Helper to format due dates beautifully
+    const formatWorkDueDate = (dateString) => {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+      return date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    };
+
     // --- TAB 1: RENDER OVERVIEW DASHBOARD ---
     const renderDashboardView = () => {
       let totalBudget = 0;
@@ -1574,20 +2133,26 @@
         totalPaid += parseFloat(w.amountPaid || 0);
       });
 
-      dom.statTotalBudget.textContent = formatCurrency(totalBudget);
-      dom.statTotalPaid.textContent = formatCurrency(totalPaid);
-      dom.statTotalUnpaid.textContent = formatCurrency(totalBudget - totalPaid);
-      dom.statTotalWorks.textContent = state.works.length;
+      if (dom.statTotalBudget) dom.statTotalBudget.textContent = formatCurrency(totalBudget);
+      if (dom.statTotalPaid) dom.statTotalPaid.textContent = formatCurrency(totalPaid);
+      if (dom.statTotalUnpaid) dom.statTotalUnpaid.textContent = formatCurrency(totalBudget - totalPaid);
+      if (dom.statTotalWorks) dom.statTotalWorks.textContent = state.works.length;
 
-      if (state.works.length === 0) {
+      if (!dom.dashboardRecentList || !dom.dashboardCompletedList) return;
+
+      const activeWorks = state.works.filter(w => !isProjectLifecycleCompleted(w));
+      const completedWorks = state.works.filter(w => isProjectLifecycleCompleted(w));
+
+      // 1. Populate Active Works Section
+      if (activeWorks.length === 0) {
         dom.dashboardRecentList.innerHTML = `
           <div class="bg-white border border-slate-200 rounded-xl p-8 text-center text-slate-400 text-xs">
             No active works mapped in this segment yet. Please configure a template layout and add entries to begin.
           </div>
         `;
       } else {
-        const sorted = [...state.works].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4);
-        dom.dashboardRecentList.innerHTML = sorted.map(work => {
+        const sortedActive = [...activeWorks].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 4);
+        dom.dashboardRecentList.innerHTML = sortedActive.map(work => {
           const matchedWf = state.workflows.find(w => w.id === work.workflowId);
           const flowColor = matchedWf ? matchedWf.color : 'indigo';
           const tasksLength = work.tasks ? work.tasks.length : 0;
@@ -1596,17 +2161,23 @@
           const budgetText = formatCurrency(work.totalBudget || 0);
           const paidText = formatCurrency(work.amountPaid || 0);
 
-          const clientMarkup = work.clientName ? `<p class="text-[10px] text-slate-500 font-medium">Client: ${work.clientName}</p>` : '';
-          const completionTick = isProjectLifecycleCompleted(work) ? `
-            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-sm" title="Project Complete">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-              </svg>
+          const clientMarkup = work.clientName ? `<p class="text-[10px] text-slate-500 font-medium">Client: ${work.clientName} ${work.shopName ? `(${work.shopName})` : ''}</p>` : '';
+          
+          const previewImageBadge = work.imageUrl ? `
+            <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 shrink-0 bg-slate-50 cursor-zoom-in group-hover:ring-2 group-hover:ring-indigo-500 transition-all duration-150 lightbox-trigger-btn" data-url="${work.imageUrl}" data-title="${work.title}">
+              <img src="${work.imageUrl}" alt="Preview" class="w-full h-full object-cover">
+            </div>
+          ` : '';
+
+          const dueDateMarkup = work.dueDate ? `
+            <span class="text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100 flex items-center gap-1 shrink-0">
+              <span>📅</span> Due: ${formatWorkDueDate(work.dueDate)}
             </span>
           ` : '';
 
           return `
-            <div data-id="${work.id}" class="recent-work-card bg-white border border-slate-200 hover:border-slate-300 p-4 rounded-xl shadow-sm hover:shadow transition duration-150 cursor-pointer flex items-start gap-4 relative group">
+            <div data-id="${work.id}" class="recent-work-card bg-white border border-slate-200 hover:border-slate-300 p-4 rounded-xl shadow-sm hover:shadow transition duration-150 cursor-pointer flex items-start gap-4 relative group animate-fade-in">
+              ${previewImageBadge}
               <div class="w-9 h-9 rounded-lg shrink-0 flex items-center justify-center text-xs font-bold border ${getBadgeStyle(flowColor)}">
                 ${(work.category || 'GEN').slice(0, 2).toUpperCase()}
               </div>
@@ -1615,7 +2186,6 @@
                   <h4 class="text-xs font-bold text-slate-900 truncate pr-16">${work.title}</h4>
                   <span class="text-[9px] font-bold px-2 py-0.5 rounded border ${getPriorityStyle(work.priority)}">${work.priority}</span>
                   <span class="text-[9px] font-bold px-2 py-0.5 rounded border ${getPaymentStyle(work.paymentStatus || 'Unpaid')}">${work.paymentStatus || 'Unpaid'}</span>
-                  ${getCompletedTickHTML(work)}
                 </div>
                 ${clientMarkup}
                 <p class="text-[11px] text-slate-400 line-clamp-1">${work.description || 'No Spec objective defined.'}</p>
@@ -1625,10 +2195,19 @@
                   <span class="text-slate-300">&bull;</span>
                   <span class="font-semibold text-slate-600">Value: ${budgetText} (${paidText} Paid)</span>
                   <span class="text-slate-300">&bull;</span>
-                  <span>${finishedTasksLength}/${work.tasks ? work.tasks.length : 0} milestones</span>
+                  <span>${finishedTasksLength}/${tasksLength} milestones</span>
+                  ${dueDateMarkup}
                 </div>
               </div>
               <div class="absolute right-4 top-4 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                ${work.imageUrl ? `
+                  <button data-url="${work.imageUrl}" data-title="${work.title}" class="lightbox-trigger-btn p-1 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-600 rounded transition animate-fade-in" title="View Attachment Image">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                  </button>
+                ` : ''}
                 <button data-id="${work.id}" class="btn-inline-edit p-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 rounded transition" title="Edit Entry">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
                 </button>
@@ -1636,29 +2215,89 @@
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.109 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
                 </button>
               </div>
-              <div class="absolute right-4 top-4 pointer-events-none group-hover:opacity-0 transition-opacity duration-150">
-                ${completionTick}
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 2. Populate Completed Works Section (Closed Stages)
+      if (completedWorks.length === 0) {
+        dom.dashboardCompletedList.innerHTML = `
+          <div class="bg-white border border-slate-200 rounded-xl p-6 text-center text-slate-400 text-xs">
+            No completed lifecycle projects detected yet. Track your milestones and close pipeline stages!
+          </div>
+        `;
+      } else {
+        const sortedCompleted = [...completedWorks].sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)).slice(0, 4);
+        dom.dashboardCompletedList.innerHTML = sortedCompleted.map(work => {
+          const matchedWf = state.workflows.find(w => w.id === work.workflowId);
+          const flowColor = matchedWf ? matchedWf.color : 'indigo';
+          const tasksLength = work.tasks ? work.tasks.length : 0;
+          const finishedTasksLength = work.tasks ? work.tasks.filter(t => t.done).length : 0;
+          const budgetText = formatCurrency(work.totalBudget || 0);
+
+          const previewImageBadge = work.imageUrl ? `
+            <div class="w-8 h-8 rounded-lg overflow-hidden border border-slate-200 shrink-0 bg-slate-50 cursor-zoom-in lightbox-trigger-btn" data-url="${work.imageUrl}" data-title="${work.title}">
+              <img src="${work.imageUrl}" alt="Preview" class="w-full h-full object-cover">
+            </div>
+          ` : '';
+
+          return `
+            <div data-id="${work.id}" class="completed-work-card bg-slate-50/60 border border-slate-200 p-3 rounded-xl flex items-center justify-between gap-3 group cursor-pointer hover:bg-slate-50 transition animate-fade-in">
+              <div class="flex items-center gap-3 min-w-0">
+                ${previewImageBadge}
+                <div class="w-7 h-7 text-[10px] rounded-lg shrink-0 flex items-center justify-center font-bold border ${getBadgeStyle(flowColor)}">
+                  ${(work.category || 'GEN').slice(0, 2).toUpperCase()}
+                </div>
+                <div class="min-w-0">
+                  <h4 class="text-xs font-bold text-slate-800 truncate">${work.title}</h4>
+                  <p class="text-[10px] text-slate-400 font-medium">Completed Value: <span class="font-bold text-emerald-600">${budgetText}</span></p>
+                </div>
+              </div>
+              
+              <!-- Check metrics -->
+              <div class="flex items-center gap-2">
+                <span class="text-[9px] bg-emerald-50 text-emerald-700 font-extrabold px-1.5 py-0.5 rounded-full border border-emerald-200 shadow-sm shrink-0 flex items-center gap-1">
+                  <span>✔</span> stage closed
+                </span>
+                <button data-id="${work.id}" class="btn-inline-delete p-1 opacity-0 group-hover:opacity-100 hover:bg-rose-50 border border-transparent hover:border-rose-200 text-rose-600 rounded transition" title="Delete record">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.109 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                </button>
               </div>
             </div>
           `;
         }).join('');
-
-        document.querySelectorAll('.recent-work-card').forEach(card => {
-          card.addEventListener('click', (e) => {
-            if (e.target.closest('.btn-inline-edit') || e.target.closest('.btn-inline-delete')) return;
-            state.selectedWorkId = card.dataset.id;
-            dom.workDetailsDrawer.classList.remove('hidden');
-            updateAppView();
-          });
-        });
-
-        attachInlineActionListeners();
       }
+
+      // Add details and inline event bindings
+      document.querySelectorAll('.recent-work-card, .completed-work-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.lightbox-trigger-btn') || e.target.closest('.btn-inline-edit') || e.target.closest('.btn-inline-delete')) return;
+          state.selectedWorkId = card.dataset.id;
+          dom.workDetailsDrawer.classList.remove('hidden');
+          updateAppView();
+        });
+      });
+
+      // Bind lightbox popup zoom-in trigger
+      document.querySelectorAll('.lightbox-trigger-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          dom.lightboxImage.src = btn.dataset.url;
+          dom.lightboxCaption.textContent = btn.dataset.title || 'Attached Workspace Asset';
+          dom.lightboxModal.classList.remove('hidden');
+          dom.lightboxModal.classList.add('flex');
+        });
+      });
+
+      attachInlineActionListeners();
+
+      if (!dom.dashboardPipelineList) return;
 
       if (state.workflows.length === 0) {
         dom.dashboardPipelineList.innerHTML = `
           <div class="bg-white border border-slate-200 rounded-xl p-6 text-center text-slate-400 text-xs">
-            No pipeline models configured. Head to templates to define active chronological lifecycle structures.
+            No pipeline templates seeded. Try configuring layouts to begin.
           </div>
         `;
       } else {
@@ -1686,6 +2325,7 @@
 
     // --- TAB 2: MY SAVED WORKS DIRECTORY GRID ---
     const renderWorksDirectory = () => {
+      if (!dom.worksGrid || !dom.workFilterCategory) return;
       const categoriesSet = new Set(state.works.map(w => w.category).filter(Boolean));
       const activeCatFilter = dom.workFilterCategory.value;
       
@@ -1695,24 +2335,47 @@
       const searchQueryVal = dom.workSearchInput.value.toLowerCase().trim();
       const categoryFilterVal = dom.workFilterCategory.value;
       const priorityFilterVal = dom.workFilterPriority.value;
+      const lifecycleFilterVal = dom.workFilterLifecycleState.value;
+      const sortVal = dom.workFilterSort.value;
 
-      const filtered = state.works.filter(work => {
+      let filtered = state.works.filter(work => {
         const matchesSearch = work.title.toLowerCase().includes(searchQueryVal) || 
                               (work.description && work.description.toLowerCase().includes(searchQueryVal)) ||
                               (work.category && work.category.toLowerCase().includes(searchQueryVal)) ||
-                              (work.clientName && work.clientName.toLowerCase().includes(searchQueryVal));
+                              (work.clientName && work.clientName.toLowerCase().includes(searchQueryVal)) ||
+                              (work.shopName && work.shopName.toLowerCase().includes(searchQueryVal));
         const matchesCategory = categoryFilterVal === 'All' || work.category === categoryFilterVal;
         const matchesPriority = priorityFilterVal === 'All' || work.priority === priorityFilterVal;
 
-        return matchesSearch && matchesCategory && matchesPriority;
+        const isCompleted = isProjectLifecycleCompleted(work);
+        let matchesLifecycle = true;
+        if (lifecycleFilterVal === 'Active') {
+          matchesLifecycle = !isCompleted;
+        } else if (lifecycleFilterVal === 'Completed') {
+          matchesLifecycle = isCompleted;
+        }
+
+        return matchesSearch && matchesCategory && matchesPriority && matchesLifecycle;
       });
+
+      // Implement Custom Sorting Logic
+      if (sortVal === 'Category') {
+        filtered.sort((a, b) => (a.category || '').localeCompare(b.category || ''));
+      } else if (sortVal === 'BudgetHigh') {
+        filtered.sort((a, b) => parseFloat(b.totalBudget || 0) - parseFloat(a.totalBudget || 0));
+      } else if (sortVal === 'BudgetLow') {
+        filtered.sort((a, b) => parseFloat(a.totalBudget || 0) - parseFloat(b.totalBudget || 0));
+      } else {
+        // Newest Added default
+        filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      }
 
       if (filtered.length === 0) {
         dom.worksGrid.innerHTML = `
           <div class="col-span-full bg-white border border-slate-200 rounded-2xl p-16 text-center text-slate-400">
             <span class="text-3xl block mb-3">📁</span>
             <p class="text-sm font-semibold mb-1 text-slate-700">No directory matches found</p>
-            <p class="text-xs max-w-sm mx-auto">Try lowering filters, clearing your active search keyword, or adding dynamic project records.</p>
+            <p class="text-xs max-w-sm mx-auto">Try lowering filters, switching active lifecycle state views, or adding a new project spec.</p>
           </div>
         `;
         return;
@@ -1727,66 +2390,104 @@
 
         const sidebarHighlightClass = getBadgeStyle(flowColor).split(' ')[0];
         const budgetText = formatCurrency(work.totalBudget || 0);
-        const paidText = formatCurrency(work.amountPaid || 0);
-
+        
         const clientMarkup = work.clientName ? `
-          <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 mt-2 text-[10px] text-slate-600 flex justify-between items-center">
-            <span class="font-medium text-slate-500">Client:</span>
-            <span class="font-bold text-slate-700 truncate max-w-[120px]">${work.clientName}</span>
+          <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 mt-2 text-[10px] text-slate-600 flex flex-col gap-0.5">
+            <div class="flex justify-between items-center">
+              <span class="font-medium text-slate-500">Client:</span>
+              <span class="font-bold text-slate-700 truncate max-w-[120px]">${work.clientName}</span>
+            </div>
+            ${work.shopName ? `
+              <div class="flex justify-between items-center">
+                <span class="font-medium text-slate-400 text-[9px]">Shop storefront:</span>
+                <span class="font-semibold text-slate-500 text-[9px] truncate max-w-[120px]">${work.shopName}</span>
+              </div>
+            ` : ''}
+          </div>
+        ` : '';
+
+        const dueDateMarkup = work.dueDate ? `
+          <div class="text-[9px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-100 shrink-0 self-center">
+            📅 Due: ${formatWorkDueDate(work.dueDate)}
+          </div>
+        ` : '';
+
+        // Display EXACT uploaded image Thumbnail with clear 'View Full Image' overlay face option
+        const cardPreviewImage = work.imageUrl ? `
+          <div class="w-full h-32 overflow-hidden bg-slate-50 border-b border-slate-100 relative group cursor-zoom-in lightbox-trigger-btn" data-url="${work.imageUrl}" data-title="${work.title}">
+            <img src="${work.imageUrl}" alt="Work Attachment" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-200">
+              <span class="text-white text-[10px] font-bold bg-slate-900/80 px-2.5 py-1 rounded-full border border-slate-700/50 flex items-center gap-1.5 shadow-md">
+                🔍 View Full Image
+              </span>
+            </div>
           </div>
         ` : '';
 
         return `
-          <div data-id="${work.id}" class="work-directory-card bg-white border border-slate-200 hover:border-slate-300 p-5 rounded-2xl transition duration-150 cursor-pointer flex flex-col justify-between shadow-sm relative overflow-hidden group">
-            <span class="absolute top-0 bottom-0 left-0 w-1 ${sidebarHighlightClass}"></span>
+          <div data-id="${work.id}" class="work-directory-card bg-white border border-slate-200 hover:border-slate-300 rounded-2xl transition duration-150 cursor-pointer flex flex-col justify-between shadow-sm relative overflow-hidden group animate-fade-in">
+            <span class="absolute top-0 bottom-0 left-0 w-1 ${sidebarHighlightClass} z-10"></span>
+            
+            ${cardPreviewImage}
 
-            <div class="space-y-3.5">
-              <div class="flex justify-between items-start gap-2">
-                <div class="flex gap-1.5 flex-wrap items-center">
-                  <span class="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-100 text-indigo-700 border border-slate-200">
-                    ${work.category || 'General'}
-                  </span>
-                  <span class="text-[9px] font-bold px-2 py-0.5 rounded-full border ${getPriorityStyle(work.priority)}">
-                    ${work.priority}
-                  </span>
-                  ${getCompletedTickHTML(work)}
+            <div class="p-5 space-y-3.5 flex-1 flex flex-col justify-between">
+              <div class="space-y-3.5">
+                <div class="flex justify-between items-start gap-2">
+                  <div class="flex gap-1.5 flex-wrap items-center">
+                    <span class="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-100 text-indigo-700 border border-slate-200">
+                      ${work.category || 'General'}
+                    </span>
+                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-full border ${getPriorityStyle(work.priority)}">
+                      ${work.priority}
+                    </span>
+                    ${getCompletedTickHTML(work)}
+                  </div>
+                  
+                  <!-- Card Action Controls with clean non-broken hover structures -->
+                  <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                    ${work.imageUrl ? `
+                      <button data-url="${work.imageUrl}" data-title="${work.title}" class="lightbox-trigger-btn p-1 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-600 rounded transition" title="View Image Attachment">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                      </button>
+                    ` : ''}
+                    <button data-id="${work.id}" class="btn-inline-edit p-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 rounded transition" title="Edit Entry">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                    </button>
+                    <button data-id="${work.id}" class="btn-inline-delete p-1 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded transition" title="Delete Entry">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.109 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="space-y-1">
+                  <h3 class="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition truncate">${work.title}</h3>
+                  <p class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">${work.description || 'No objective outlined.'}</p>
+                  ${clientMarkup}
                 </div>
                 
-                <!-- Card Action Controls -->
-                <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                  <button data-id="${work.id}" class="btn-inline-edit p-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 rounded transition" title="Edit Entry">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
-                  </button>
-                  <button data-id="${work.id}" class="btn-inline-delete p-1 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded transition" title="Delete Entry">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.109 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
-                  </button>
+                <!-- Payment Summary Tag on Directory Card -->
+                <div class="pt-1 flex items-center justify-between">
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded border ${getPaymentStyle(work.paymentStatus || 'Unpaid')}">${work.paymentStatus || 'Unpaid'}</span>
+                  <span class="text-[10px] font-semibold text-slate-600">${budgetText} total</span>
                 </div>
               </div>
 
-              <div class="space-y-1">
-                <h3 class="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition truncate">${work.title}</h3>
-                <p class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">${work.description || 'No objective outlined.'}</p>
-                ${clientMarkup}
-              </div>
-              
-              <!-- Payment Summary Tag on Directory Card -->
-              <div class="pt-1 flex items-center justify-between">
-                <span class="text-[9px] font-bold px-2 py-0.5 rounded border ${getPaymentStyle(work.paymentStatus || 'Unpaid')}">${work.paymentStatus || 'Unpaid'}</span>
-                <span class="text-[10px] font-semibold text-slate-600">${budgetText} total</span>
-              </div>
-            </div>
-
-            <!-- Footer progress trackers -->
-            <div class="border-t border-slate-100 pt-3 mt-4 space-y-2">
-              <div class="flex items-center justify-between text-[10px] text-slate-500">
-                <span class="flex items-center gap-1">
-                  <span class="text-slate-400 font-medium">Stage:</span>
-                  <span class="bg-slate-50 text-slate-700 font-bold px-1.5 py-0.5 rounded border border-slate-200">${work.currentStage}</span>
-                </span>
-                <span class="font-semibold text-slate-600">${finishedTasksLength}/${tasksLength} Checklist</span>
-              </div>
-              <div class="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
-                <div class="bg-indigo-600 h-full transition-all duration-200" style="width: ${percent}%"></div>
+              <!-- Footer progress trackers -->
+              <div class="border-t border-slate-100 pt-3 mt-4 space-y-2">
+                <div class="flex items-center justify-between text-[10px] text-slate-500">
+                  <span class="flex items-center gap-1">
+                    <span class="text-slate-400 font-medium">Stage:</span>
+                    <span class="bg-slate-50 text-slate-700 font-bold px-1.5 py-0.5 rounded border border-slate-200">${work.currentStage}</span>
+                  </span>
+                  <span class="font-semibold text-slate-600">${finishedTasksLength}/${tasksLength} Checklist</span>
+                </div>
+                <div class="w-full bg-slate-100 h-1 rounded-full overflow-hidden mb-2">
+                  <div class="bg-indigo-600 h-full transition-all duration-200" style="width: ${percent}%"></div>
+                </div>
+                ${dueDateMarkup}
               </div>
             </div>
           </div>
@@ -1795,27 +2496,65 @@
 
       document.querySelectorAll('.work-directory-card').forEach(card => {
         card.addEventListener('click', (e) => {
-          if (e.target.closest('.btn-inline-edit') || e.target.closest('.btn-inline-delete')) return;
+          if (e.target.closest('.lightbox-trigger-btn') || e.target.closest('.btn-inline-edit') || e.target.closest('.btn-inline-delete')) return;
           state.selectedWorkId = card.dataset.id;
           dom.workDetailsDrawer.classList.remove('hidden');
           updateAppView();
         });
       });
 
+      // Bind direct lightbox popup click zoom-in
+      document.querySelectorAll('.lightbox-trigger-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          dom.lightboxImage.src = btn.dataset.url;
+          dom.lightboxCaption.textContent = btn.dataset.title || 'Workspace Attached Image';
+          dom.lightboxModal.classList.remove('hidden');
+          dom.lightboxModal.classList.add('flex');
+        });
+      });
+
       attachInlineActionListeners();
     };
 
+    // Binding directory reactive selectors
+    dom.workFilterSort.addEventListener('change', () => {
+      renderWorksDirectory();
+    });
+
+    dom.workFilterLifecycleState.addEventListener('change', () => {
+      renderWorksDirectory();
+    });
+
+    dom.workFilterPriority.addEventListener('change', () => {
+      renderWorksDirectory();
+    });
+
+    dom.resetFiltersBtn.addEventListener('click', () => {
+      dom.workSearchInput.value = '';
+      dom.workFilterCategory.value = 'All';
+      dom.workFilterPriority.value = 'All';
+      dom.workFilterLifecycleState.value = 'Active';
+      dom.workFilterSort.value = 'Newest';
+      renderWorksDirectory();
+    });
+
     // --- TAB 3: RENDER VISUAL KANBAN BOARD ---
     const renderKanbanBoard = () => {
+      if (!dom.kanbanBoardColumns) return;
       if (state.workflows.length === 0) {
         dom.kanbanBoardColumns.innerHTML = `
           <div class="bg-white border border-slate-200 rounded-2xl p-16 text-center text-slate-400 max-w-xl mx-auto w-full col-span-full">
             <span class="text-4xl block mb-4">⚡</span>
             <p class="text-sm font-semibold mb-1 text-slate-700">No active pipelines defined</p>
-            <p class="text-xs max-w-sm mx-auto mb-4">To view the Kanban board, please create your first pipeline layout in the "Templates" tab.</p>
+            <p class="text-xs max-w-sm mx-auto mb-4">To view the Kanban board, please create your first pipeline template in the "Templates" tab.</p>
             <button data-goto-tab="pipelines" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2 px-4 rounded-xl transition">Configure Templates &rarr;</button>
           </div>
         `;
+        const gotoBtn = dom.kanbanBoardColumns.querySelector('[data-goto-tab]');
+        if (gotoBtn) {
+          gotoBtn.addEventListener('click', () => switchNavigationTab('pipelines'));
+        }
         return;
       }
 
@@ -1836,7 +2575,7 @@
         const isFinalStage = stageIndex === activeWf.stages.length - 1;
 
         return `
-          <div class="w-full lg:w-80 bg-slate-100/40 border border-slate-200 rounded-2xl flex flex-col shrink-0 overflow-hidden shadow-sm">
+          <div class="w-full lg:w-80 bg-slate-100/40 border border-slate-200 rounded-2xl flex flex-col shrink-0 overflow-hidden shadow-sm animate-fade-in">
             <!-- Stage Title Header -->
             <div class="p-4 bg-white border-b border-slate-200/80 flex justify-between items-center">
               <div class="flex items-center gap-2">
@@ -1868,10 +2607,16 @@
                   </span>
                 ` : '';
 
+                const cardImg = work.imageUrl ? `
+                  <div class="w-full h-20 rounded-lg overflow-hidden bg-slate-50 border border-slate-100 mb-2 relative group cursor-zoom-in lightbox-trigger-btn" data-url="${work.imageUrl}" data-title="${work.title}">
+                    <img src="${work.imageUrl}" alt="Work Attachment" class="w-full h-full object-cover">
+                  </div>
+                ` : '';
+
                 return `
-                  <div data-id="${work.id}" class="kanban-work-card bg-white border border-slate-200 hover:border-slate-300 p-4 rounded-xl shadow-sm hover:shadow transition duration-150 cursor-pointer group relative">
+                  <div data-id="${work.id}" class="kanban-work-card bg-white border border-slate-200 hover:border-slate-300 p-4 rounded-xl shadow-sm hover:shadow transition duration-150 cursor-pointer group relative animate-fade-in">
                     ${completionBadge}
-                    
+                    ${cardImg}
                     <div class="flex justify-between items-start mb-2 pr-12">
                       <div class="flex flex-wrap gap-1">
                         <span class="text-[8px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-indigo-700">
@@ -1885,8 +2630,16 @@
 
                     <!-- Direct Card Controls on Kanban -->
                     <div class="absolute right-3 top-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                      ${work.imageUrl ? `
+                        <button data-url="${work.imageUrl}" data-title="${work.title}" class="lightbox-trigger-btn p-1 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-600 rounded transition" title="View Attachment Image">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                          </svg>
+                        </button>
+                      ` : ''}
                       <button data-id="${work.id}" class="btn-inline-edit p-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 rounded transition" title="Edit Entry">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25(2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
                       </button>
                       <button data-id="${work.id}" class="btn-inline-delete p-1 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded transition" title="Delete Entry">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.109 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
@@ -1943,7 +2696,7 @@
 
       document.querySelectorAll('.kanban-work-card').forEach(card => {
         card.addEventListener('click', (e) => {
-          if (e.target.closest('.stepper-advance-btn') || e.target.closest('.btn-inline-edit') || e.target.closest('.btn-inline-delete')) return;
+          if (e.target.closest('.stepper-advance-btn') || e.target.closest('.btn-inline-edit') || e.target.closest('.btn-inline-delete') || e.target.closest('.lightbox-trigger-btn')) return;
           state.selectedWorkId = card.dataset.id;
           dom.workDetailsDrawer.classList.remove('hidden');
           updateAppView();
@@ -1973,40 +2726,50 @@
               await updateDoc(docRef, { currentStage: targetStage, updatedAt: new Date().toISOString() });
               triggerToast(`Stage update saved: "${targetStage}"`);
             } catch (err) {
-              state.works = state.works.map(w => w.id === workId ? { ...w, currentStage: targetStage, updatedAt: new Date().toISOString() } : w);
-              updateAppView();
-              triggerToast(`Moved status to "${targetStage}" locally.`);
+              console.error("Firestore stage update failed:", err);
+              triggerToast("Cloud stage update failed: " + err.message, true);
             }
           }
+        });
+      });
+
+      // Bind direct lightbox popup click zoom-in on Kanban thumbnails
+      document.querySelectorAll('.lightbox-trigger-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          dom.lightboxImage.src = btn.dataset.url;
+          dom.lightboxCaption.textContent = btn.dataset.title || 'Workspace Attached Image';
+          dom.lightboxModal.classList.remove('hidden');
+          dom.lightboxModal.classList.add('flex');
         });
       });
 
       attachInlineActionListeners();
     };
 
+    dom.boardPipelineSelector.addEventListener('change', (e) => {
+      state.boardWorkflowFilter = e.target.value;
+      renderKanbanBoard();
+    });
+
     // --- TAB 4: RENDER PIPELINE CONFIGURATOR ---
     const renderPipelineConfigurator = () => {
+      if (!dom.pipelinesList) return;
       dom.pipelinesList.innerHTML = state.workflows.map(wf => {
-        const isPreset = ['wf-creative', 'wf-dev', 'wf-simple'].includes(wf.id);
-
         return `
-          <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
+          <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm animate-fade-in">
             <div class="flex justify-between items-start gap-4">
               <div class="space-y-1">
                 <h3 class="text-sm font-bold text-slate-800">${wf.name}</h3>
                 <p class="text-[10px] text-slate-400 font-mono">Reference Key: ${wf.id}</p>
               </div>
 
-              ${!isPreset ? `
-                <button
-                  data-delete-wf-id="${wf.id}"
-                  class="delete-workflow-btn text-[9px] font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-lg transition"
-                >
-                  Delete custom
-                </button>
-              ` : `
-                <span class="text-[9px] bg-slate-100 text-slate-500 px-2 py-1 rounded-lg border border-slate-200 font-bold">Preset System Standard</span>
-              `}
+              <button
+                data-delete-wf-id="${wf.id}"
+                class="delete-workflow-btn text-[9px] font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-lg transition"
+              >
+                Delete custom
+              </button>
             </div>
 
             <div class="flex items-center gap-2">
@@ -2039,7 +2802,12 @@
             return;
           }
 
-          const confirmed = await confirmDeleteModal("Delete this custom workflow pipeline? Active board structures linked to this workflow will revert to simplicity defaults.");
+          if (state.workflows.length <= 1) {
+            triggerToast("Cannot delete the only remaining pipeline template configuration.", true);
+            return;
+          }
+
+          const confirmed = await confirmDeleteModalWrapper("Delete this custom workflow pipeline? Active board structures linked to this workflow will revert to simplicity defaults.");
           if (!confirmed) return;
 
           try {
@@ -2047,12 +2815,11 @@
             await deleteDoc(docRef);
             triggerToast("Pipeline template deleted.");
             if (state.boardWorkflowFilter === idToDelete) {
-              state.boardWorkflowFilter = state.workflows.find(w => w.id !== idToDelete)?.id || 'wf-simple';
+              state.boardWorkflowFilter = state.workflows.find(w => w.id !== idToDelete)?.id || '';
             }
           } catch (err) {
-            state.workflows = state.workflows.filter(w => w.id !== idToDelete);
-            updateAppView();
-            triggerToast("Pipeline removed locally.");
+            console.error("Firestore workflow delete failed:", err);
+            triggerToast("Cloud delete failed: " + err.message, true);
           }
         });
       });
@@ -2060,13 +2827,13 @@
 
     // --- Mass Configuration Clear Helper (Feature: remove all templates) ---
     dom.clearAllCustomPipelinesBtn.addEventListener('click', async () => {
-      const customTemplates = state.workflows.filter(w => !['wf-creative', 'wf-dev', 'wf-simple'].includes(w.id));
+      const customTemplates = [...state.workflows];
       if (customTemplates.length === 0) {
         triggerToast("No custom pipeline templates found to remove.", true);
         return;
       }
 
-      const confirmed = await confirmDeleteModal(`Are you sure you want to remove all (${customTemplates.length}) custom workflow pipelines? Projects linked to deleted templates will fall back to default simple lifecycles.`);
+      const confirmed = await confirmDeleteModalWrapper(`Are you sure you want to remove all (${customTemplates.length}) configured workflow pipelines? Projects linked to deleted templates will fall back to defaults.`);
       if (!confirmed) return;
 
       try {
@@ -2076,7 +2843,7 @@
           await deleteDoc(docRef);
         }
         triggerToast("Cleared all user-configured custom pipelines successfully.");
-        state.boardWorkflowFilter = 'wf-simple';
+        state.boardWorkflowFilter = '';
       } catch (err) {
         console.error("Purging templates failed: ", err);
         triggerToast("Failed to remove template objects.", true);
@@ -2097,7 +2864,6 @@
         return;
       }
 
-      // Sync texts
       dom.drawerTitle.textContent = work.title;
       dom.drawerCategoryBadge.textContent = work.category || 'General';
       
@@ -2107,7 +2873,7 @@
       dom.drawerPaymentBadge.textContent = work.paymentStatus || 'Unpaid';
       dom.drawerPaymentBadge.className = `text-[9px] font-bold tracking-wider px-2 py-0.5 rounded-full border ${getPaymentStyle(work.paymentStatus || 'Unpaid')}`;
 
-      // Dynamic completed tick icon validation (Feature: Complete pipeline green tick indicator)
+      // Dynamic completed tick icon validation
       const existingTick = document.getElementById('drawerGreenCompletedTickBadge');
       if (existingTick) existingTick.remove();
 
@@ -2124,18 +2890,32 @@
         document.getElementById('drawerCompletedBadgeWrapper').prepend(completedTick);
       }
 
-      // Render Client metadata box (Feature: Client details integration)
+      // Render Client metadata box
       if (work.clientName) {
         const emailInfo = work.clientContact ? ` &bull; ${work.clientContact}` : '';
         dom.drawerClientBox.innerHTML = `
           <div class="flex items-center gap-1.5 bg-slate-100/60 p-2.5 rounded-xl border border-slate-200 mt-1">
-            <span class="text-slate-400 font-bold text-[9px] uppercase tracking-wider">Client Portfolio:</span>
+            <span class="text-slate-400 font-bold text-[9px] uppercase tracking-wider">Client:</span>
             <span class="font-bold text-slate-800 text-xs">${work.clientName}</span>
-            <span class="text-slate-500">${emailInfo}</span>
+            <span class="text-slate-500 text-xs">${emailInfo}</span>
           </div>
         `;
       } else {
         dom.drawerClientBox.innerHTML = '';
+      }
+
+      if (work.shopName) {
+        dom.drawerShopBox.textContent = `🏪 Storefront: ${work.shopName}`;
+        dom.drawerShopBox.classList.remove('hidden');
+      } else {
+        dom.drawerShopBox.classList.add('hidden');
+      }
+
+      if (work.dueDate) {
+        dom.drawerDueDateBox.innerHTML = `<span>⏳ Due:</span> <span>${formatWorkDueDate(work.dueDate)}</span>`;
+        dom.drawerDueDateBox.classList.remove('hidden');
+      } else {
+        dom.drawerDueDateBox.classList.add('hidden');
       }
 
       // Budget display inside drawer
@@ -2150,7 +2930,15 @@
       dom.drawerDescDisplay.textContent = work.description || 'No objectives declared for this spec.';
       dom.drawerModificationDate.textContent = `Last synchronized: ${work.updatedAt ? new Date(work.updatedAt).toLocaleString() : 'N/A'}`;
 
-      // Stepper Stages setup - Enhanced with beautiful green ticks on closed stages & solid colors
+      // Renders EXACTLY what was uploaded inside the details slide-over image frame
+      if (work.imageUrl) {
+        dom.drawerImageDisplay.src = work.imageUrl;
+        dom.drawerImageContainer.classList.remove('hidden');
+      } else {
+        dom.drawerImageContainer.classList.add('hidden');
+      }
+
+      // Stepper Stages setup
       const activeWf = state.workflows.find(w => w.id === work.workflowId) || { id: 'wf-simple', name: 'Standard Pipeline', stages: ['To Do', 'Active Works', 'Complete'], color: 'purple' };
       const currentStageIndex = activeWf.stages.indexOf(work.currentStage);
 
@@ -2162,15 +2950,12 @@
         let tickIcon = '';
 
         if (isCurrent) {
-          // Solid shaded green box with tick
           btnClass = 'bg-emerald-600 text-white font-bold border-emerald-700 shadow-md ring-2 ring-emerald-500/25';
           tickIcon = `<span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-white text-emerald-600 text-[9px] font-black mr-1 shrink-0">✓</span>`;
         } else if (isCompleted) {
-          // Shaded light green box with tick
           btnClass = 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold border-emerald-200 shadow-sm';
           tickIcon = `<span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-600 text-white text-[9px] font-bold mr-1 shrink-0">✓</span>`;
         } else {
-          // Standard pending box
           btnClass = 'bg-white hover:bg-slate-50 text-slate-500 border-slate-200';
         }
 
@@ -2198,23 +2983,27 @@
             await updateDoc(docRef, { currentStage: targetStage, updatedAt: new Date().toISOString() });
             triggerToast(`Work stage shifted: "${targetStage}"`);
           } catch (err) {
-            state.works = state.works.map(w => w.id === work.id ? { ...w, currentStage: targetStage, updatedAt: new Date().toISOString() } : w);
-            updateAppView();
-            triggerToast(`Shifted stage to "${targetStage}" locally.`);
+            console.error("Firestore stage shift failed:", err);
+            triggerToast("Cloud save failed: " + err.message, true);
           }
         });
       });
 
-      // Render Checklists
-      const tasksList = work.tasks || [];
+      // Filter subtasks checklist according to the active search bar keyword in drawer
+      let tasksList = work.tasks || [];
       const tasksDoneCount = tasksList.filter(t => t.done).length;
       dom.drawerChecklistMetric.textContent = `${tasksDoneCount}/${tasksList.length} Milestones`;
 
+      const searchVal = dom.drawerMilestoneSearchInput.value.toLowerCase().trim();
+      if (searchVal) {
+        tasksList = tasksList.filter(t => t.text.toLowerCase().includes(searchVal));
+      }
+
       if (tasksList.length === 0) {
-        dom.drawerSubtaskList.innerHTML = `<p class="text-[10px] text-slate-400 italic">No checklist milestones listed. Use the field above to add milestones.</p>`;
+        dom.drawerSubtaskList.innerHTML = `<p class="text-[10px] text-slate-400 italic">No checklist milestones found matching your criteria.</p>`;
       } else {
         dom.drawerSubtaskList.innerHTML = tasksList.map(task => `
-          <div data-task-id="${task.id}" class="drawer-task-row flex items-center gap-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 p-2.5 rounded-lg cursor-pointer transition">
+          <div data-task-id="${task.id}" class="drawer-task-row flex items-center gap-3 bg-white hover:bg-slate-50 border border-slate-200 p-2.5 rounded-lg cursor-pointer transition">
             <input
               type="checkbox"
               ${task.done ? 'checked' : ''}
@@ -2229,14 +3018,15 @@
         document.querySelectorAll('.drawer-task-row').forEach(row => {
           row.addEventListener('click', async () => {
             const tId = row.dataset.taskId;
-            const updatedTasks = tasksList.map(t => t.id === tId ? { ...t, done: !t.done } : t);
+            const originalTasks = work.tasks || [];
+            const updatedTasks = originalTasks.map(t => t.id === tId ? { ...t, done: !t.done } : t);
 
             try {
               const docRef = doc(db, 'artifacts', appId, 'users', state.user.uid, 'works', work.id);
               await updateDoc(docRef, { tasks: updatedTasks });
             } catch (err) {
-              state.works = state.works.map(w => w.id === work.id ? { ...w, tasks: updatedTasks } : w);
-              updateAppView();
+              console.error("Firestore subtask update failed:", err);
+              triggerToast("Cloud save failed: " + err.message, true);
             }
           });
         });
@@ -2289,10 +3079,14 @@
         await updateDoc(docRef, { tasks: updatedTasks });
         dom.newSubtaskInput.value = '';
       } catch (err) {
-        state.works = state.works.map(w => w.id === work.id ? { ...w, tasks: updatedTasks } : w);
-        updateAppView();
-        dom.newSubtaskInput.value = '';
+        console.error("Firestore subtask append failed:", err);
+        triggerToast("Cloud save failed: " + err.message, true);
       }
+    });
+
+    // Milestone Checklist search filter reactive listeners
+    dom.drawerMilestoneSearchInput.addEventListener('input', () => {
+      renderDrawerSpecWindow();
     });
 
     // Reference Link Copy Action (Clipboard rule support)
@@ -2338,10 +3132,8 @@
         state.isEditingNote = false;
         triggerToast("Spec notes updated.");
       } catch (err) {
-        state.works = state.works.map(w => w.id === work.id ? { ...w, notes: notesValue } : w);
-        state.isEditingNote = false;
-        updateAppView();
-        triggerToast("Spec notes updated locally.");
+        console.error("Firestore notes update failed:", err);
+        triggerToast("Cloud save failed: " + err.message, true);
       }
     });
 
@@ -2368,7 +3160,7 @@
       const work = state.works.find(w => w.id === id);
       if (!work) return;
 
-      const confirmed = await confirmDeleteModal(`Permanently delete "${work.title}"? Your saved scratchpad outlines, payment stats and checklists will be cleared.`);
+      const confirmed = await confirmDeleteModalWrapper(`Permanently delete "${work.title}"? Your saved scratchpad outlines, payment stats and checklists will be cleared.`);
       if (!confirmed) return;
 
       try {
@@ -2380,13 +3172,8 @@
           state.selectedWorkId = null;
         }
       } catch (err) {
-        state.works = state.works.filter(w => w.id !== id);
-        if (state.selectedWorkId === id) {
-          dom.workDetailsDrawer.classList.add('hidden');
-          state.selectedWorkId = null;
-        }
-        updateAppView();
-        triggerToast("Project deleted locally.");
+        console.error("Firestore delete failed:", err);
+        triggerToast("Cloud delete failed: " + err.message, true);
       }
     };
 
@@ -2398,11 +3185,13 @@
       document.getElementById('editWorkTitle').value = work.title;
       document.getElementById('editWorkDesc').value = work.description || '';
       document.getElementById('editWorkClientName').value = work.clientName || '';
+      document.getElementById('editWorkShopName').value = work.shopName || '';
       document.getElementById('editWorkClientContact').value = work.clientContact || '';
       document.getElementById('editWorkCategory').value = work.category || '';
       document.getElementById('editWorkPriority').value = work.priority || 'Medium';
       document.getElementById('editWorkWorkflowId').value = work.workflowId || '';
-      document.getElementById('editWorkReferenceUrl').value = work.referenceUrl || '';
+      document.getElementById('editWorkDueDate').value = work.dueDate || '';
+      document.getElementById('editWorkImageUrl').value = work.imageUrl || '';
       
       const paymentStatus = work.paymentStatus || 'Unpaid';
       document.getElementById('editWorkPaymentStatus').value = paymentStatus;
@@ -2423,6 +3212,16 @@
     };
 
     function attachInlineActionListeners() {
+      // Avoid stacking duplicate event listeners on updates
+      document.querySelectorAll('.btn-inline-edit').forEach(btn => {
+        const cloned = btn.cloneNode(true);
+        btn.replaceWith(cloned);
+      });
+      document.querySelectorAll('.btn-inline-delete').forEach(btn => {
+        const cloned = btn.cloneNode(true);
+        btn.replaceWith(cloned);
+      });
+
       document.querySelectorAll('.btn-inline-edit').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -2446,6 +3245,7 @@
       const title = document.getElementById('newWorkTitle').value.trim();
       const desc = document.getElementById('newWorkDesc').value.trim();
       const clientName = document.getElementById('newWorkClientName').value.trim();
+      const shopName = dom.newWorkShopName.value.trim();
       const clientContact = document.getElementById('newWorkClientContact').value.trim();
       const cat = document.getElementById('newWorkCategory').value.trim() || 'General';
       const priority = document.getElementById('newWorkPriority').value;
@@ -2453,13 +3253,14 @@
       const refUrl = document.getElementById('newWorkReferenceUrl').value.trim();
       const paymentStatus = document.getElementById('newWorkPaymentStatus').value;
       const budget = parseFloat(document.getElementById('newWorkBudget').value || 0);
+      const dueDate = dom.newWorkDueDate.value;
+      const imageUrl = dom.newWorkImageUrl.value;
 
       if (!wfId) {
         triggerToast("Please configure at least one Pipeline Template first in the Templates tab.", true);
         return;
       }
       
-      // Feature: dynamic advance amount calculation
       let paid = 0;
       if (paymentStatus === 'Advance Paid') {
         paid = parseFloat(document.getElementById('newWorkAdvanceAmount').value || 0);
@@ -2472,13 +3273,14 @@
         return;
       }
 
-      const matchedPipeline = state.workflows.find(w => w.id === wfId) || { stages: ['To Do'] };
+      const matchedPipeline = state.workflows.find(w => w.id === matchedPipeline.id) || { stages: ['To Do'] };
       const initialStage = matchedPipeline.stages[0] || 'To Do';
 
       const workItemData = {
         title: title,
         description: desc,
         clientName: clientName,
+        shopName: shopName,
         clientContact: clientContact,
         category: cat,
         priority: priority,
@@ -2488,6 +3290,8 @@
         workflowId: wfId,
         currentStage: initialStage,
         referenceUrl: refUrl,
+        dueDate: dueDate,
+        imageUrl: imageUrl,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         notes: '',
@@ -2499,18 +3303,14 @@
         await addDoc(worksCol, workItemData);
         triggerToast(`Work record created for "${title}"!`);
         dom.newWorkForm.reset();
+        dom.newWorkUploadFilename.textContent = '';
+        dom.newWorkUploadFilename.classList.add('hidden');
         document.getElementById('newWorkAdvancePaidContainer').classList.add('hidden');
         document.getElementById('newWorkAmountPaidContainer').classList.remove('hidden');
         dom.newWorkModal.classList.add('hidden');
       } catch (err) {
-        const localId = `work-${Date.now()}`;
-        state.works.push({ id: localId, ...workItemData });
-        updateAppView();
-        dom.newWorkForm.reset();
-        document.getElementById('newWorkAdvancePaidContainer').classList.add('hidden');
-        document.getElementById('newWorkAmountPaidContainer').classList.remove('hidden');
-        dom.newWorkModal.classList.add('hidden');
-        triggerToast(`Recorded locally: "${title}"`);
+        console.error("Firestore addDoc failed:", err);
+        triggerToast("Cloud save failed: " + err.message, true);
       }
     });
 
@@ -2523,6 +3323,7 @@
       const title = document.getElementById('editWorkTitle').value.trim();
       const desc = document.getElementById('editWorkDesc').value.trim();
       const clientName = document.getElementById('editWorkClientName').value.trim();
+      const shopName = dom.editWorkShopName.value.trim();
       const clientContact = document.getElementById('editWorkClientContact').value.trim();
       const cat = document.getElementById('editWorkCategory').value.trim() || 'General';
       const priority = document.getElementById('editWorkPriority').value;
@@ -2530,6 +3331,8 @@
       const refUrl = document.getElementById('editWorkReferenceUrl').value.trim();
       const paymentStatus = document.getElementById('editWorkPaymentStatus').value;
       const budget = parseFloat(document.getElementById('editWorkBudget').value || 0);
+      const dueDate = dom.editWorkDueDate.value;
+      const imageUrl = dom.editWorkImageUrl.value;
       
       let paid = 0;
       if (paymentStatus === 'Advance Paid') {
@@ -2550,6 +3353,7 @@
         title: title,
         description: desc,
         clientName: clientName,
+        shopName: shopName,
         clientContact: clientContact,
         category: cat,
         priority: priority,
@@ -2558,6 +3362,8 @@
         amountPaid: paid,
         workflowId: wfId,
         referenceUrl: refUrl,
+        dueDate: dueDate,
+        imageUrl: imageUrl,
         updatedAt: new Date().toISOString()
       };
 
@@ -2567,10 +3373,8 @@
         triggerToast("Spec metrics updated.");
         dom.editWorkModal.classList.add('hidden');
       } catch (err) {
-        state.works = state.works.map(w => w.id === id ? { ...w, ...updatedPayload } : w);
-        updateAppView();
-        dom.editWorkModal.classList.add('hidden');
-        triggerToast("Spec metrics updated locally.");
+        console.error("Firestore updateDoc failed:", err);
+        triggerToast("Cloud save failed: " + err.message, true);
       }
     });
 
@@ -2589,7 +3393,7 @@
 
     const renderPipelineDraftStages = () => {
       dom.newPipelineDraftStages.innerHTML = state.draftPipelineStages.map((stg, index) => `
-        <div class="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border border-slate-200">
+        <div class="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border border-slate-200 animate-fade-in">
           <span class="text-xs text-slate-700 font-medium">${index + 1}. ${stg}</span>
           <button
             type="button"
@@ -2651,19 +3455,13 @@
         await setDoc(docRef, workflowData);
         triggerToast(`Workflow config template "${name}" compiled!`);
         
-        // Reset configuration parameters
         document.getElementById('newPipelineName').value = '';
         state.draftPipelineStages = ['To Do', 'In Progress', 'Completed'];
         dom.newPipelineModal.classList.add('hidden');
         state.boardWorkflowFilter = customWorkflowId;
       } catch (err) {
-        state.workflows.push(workflowData);
-        state.boardWorkflowFilter = customWorkflowId;
-        updateAppView();
-        document.getElementById('newPipelineName').value = '';
-        state.draftPipelineStages = ['To Do', 'In Progress', 'Completed'];
-        dom.newPipelineModal.classList.add('hidden');
-        triggerToast(`Saved locally: "${name}"`);
+        console.error("Firestore setDoc failed:", err);
+        triggerToast("Cloud save failed: " + err.message, true);
       }
     });
 
@@ -2671,7 +3469,6 @@
     const switchNavigationTab = (targetTabId) => {
       state.activeTab = targetTabId;
       
-      // Update UI state links active classes
       document.querySelectorAll('.tab-trigger').forEach(btn => {
         const matched = btn.dataset.tab === targetTabId;
         btn.classList.toggle('bg-slate-100', matched);
@@ -2679,7 +3476,6 @@
         btn.classList.toggle('text-slate-600', !matched);
       });
 
-      // Show/Hide divs
       document.querySelectorAll('.tab-content').forEach(view => {
         view.classList.toggle('active', view.id === `tab-${targetTabId}`);
       });
@@ -2691,18 +3487,17 @@
       btn.addEventListener('click', () => switchNavigationTab(btn.dataset.tab));
     });
 
-    // Setup direct routing shortcuts
     document.querySelectorAll('[data-goto-tab]').forEach(elem => {
       elem.addEventListener('click', () => switchNavigationTab(elem.dataset.gotoTab));
     });
 
     // --- DIALOG MODAL TRANSITION TRIGGERS ---
     const setupModalTrigger = (openBtn, modalElem) => {
+      if (!openBtn || !modalElem) return;
       openBtn.addEventListener('click', () => {
         modalElem.classList.remove('hidden');
         modalElem.classList.add('flex');
         
-        // Custom actions when opening modals
         if (modalElem === dom.newPipelineModal) {
           renderPipelineDraftStages();
         }
@@ -2727,13 +3522,12 @@
       });
     });
 
-    // Initialize application authorization observer
-    window.onload = () => {
-      updateAuthScreenWelcomeBanner(); // Instant non-hardcoded landing state evaluate
-      initWorkspaceAuth();
-    };
+    // Close Lightbox Popup
+    dom.closeLightboxBtn.addEventListener('click', () => {
+      dom.lightboxModal.classList.add('hidden');
+      dom.lightboxModal.classList.remove('flex');
+    });
 
-    // Color mapper classes
     const getBadgeColor = (color) => {
       switch (color) {
         case 'emerald': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
@@ -2744,6 +3538,12 @@
         case 'amber': return 'bg-amber-50 text-amber-700 border-amber-200';
         default: return 'bg-slate-100 text-slate-600 border-slate-200';
       }
+    };
+
+    // Initialize application authorization observer on load
+    window.onload = () => {
+      updateAuthScreenWelcomeBanner();
+      initWorkspaceAuth();
     };
   </script>
 </body>
