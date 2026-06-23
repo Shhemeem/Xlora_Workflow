@@ -70,9 +70,15 @@
   <div id="installAppModal" class="fixed inset-0 z-[999] bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl p-6 space-y-6 animate-scale-up">
       <div class="flex justify-between items-center">
-        <div class="flex items-center gap-2 text-emerald-600">
-          <span class="text-2xl">📲</span>
-          <h3 class="text-base font-bold text-slate-900">Install WorkFlowForge</h3>
+        <div class="flex items-center gap-3 text-emerald-600">
+          <!-- Dynamic PWA App Icon inside Installation Modal -->
+          <div id="pwaModalIconPreview" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center text-white font-black text-lg shadow-sm overflow-hidden shrink-0">
+            ⚡
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Install WorkFlowForge</h3>
+            <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Workspace Application</p>
+          </div>
         </div>
         <button id="closeInstallAppModalBtn" class="text-slate-400 hover:text-slate-600 p-1.5 hover:bg-slate-100 rounded-lg transition">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -94,8 +100,12 @@
       <!-- Android Setup Guide -->
       <div id="installAndroidContent" class="space-y-4">
         <!-- Native Prompt trigger CTA -->
-        <button id="androidNativeInstallBtn" class="hidden w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-3 px-4 rounded-xl text-xs font-bold shadow-md shadow-emerald-500/10 transition duration-150 flex items-center justify-center gap-2">
+        <button id="androidNativeInstallBtn" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white py-3 px-4 rounded-xl text-xs font-bold shadow-md shadow-emerald-500/10 transition duration-150 flex items-center justify-center gap-2">
           🚀 Tap to Install Workspace App
+        </button>
+        <!-- PWA Direct Install Button -->
+        <button id="pwaDirectInstallBtn" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white py-3 px-4 rounded-xl text-xs font-bold shadow-md shadow-indigo-500/10 transition duration-150 flex items-center justify-center gap-2">
+          📲 Direct Install on Device
         </button>
         <div class="text-xs text-slate-500 leading-relaxed space-y-2">
           <p class="font-semibold text-slate-700">Manual Chrome Setup Instructions:</p>
@@ -151,7 +161,7 @@
 
       <div class="flex flex-col items-center gap-3 bg-slate-50 p-5 rounded-2xl border border-slate-200/50">
         <!-- Dynamic Preview Icon -->
-        <div id="customIconPreview" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-indigo-500/10 text-3xl select-none text-white font-black">
+        <div id="customIconPreview" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-indigo-500/10 text-3xl select-none text-white font-black overflow-hidden">
           ⚡
         </div>
         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Interactive Brand Preview</p>
@@ -233,7 +243,7 @@
   <div id="authOverlay" class="fixed inset-0 z-[9990] bg-slate-50 hidden items-center justify-center p-6 overflow-y-auto">
     <div class="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 shadow-xl space-y-6">
       <div class="text-center space-y-1">
-        <div id="authLogoWrapper" class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-400 items-center justify-center shadow-md mb-2 text-2xl text-white">
+        <div id="authLogoWrapper" class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-400 items-center justify-center shadow-md mb-2 text-2xl text-white overflow-hidden">
           ⚡
         </div>
         <h1 class="text-xl font-black tracking-tight text-slate-900">WorkFlowForge Light</h1>
@@ -726,7 +736,7 @@
           <!-- Work File Image Viewer Section (Renders EXACTLY what was uploaded) -->
           <div id="drawerImageContainer" class="space-y-2 hidden animate-fade-in">
             <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Work File Attachment</h4>
-            <div class="relative group cursor-zoom-in rounded-xl border border-slate-200 overflow-hidden bg-slate-50 max-h-64 flex items-center justify-center shadow-sm">
+            <div id="drawerImageDisplayWrapper" class="relative group cursor-zoom-in rounded-xl border border-slate-200 overflow-hidden bg-slate-50 max-h-64 flex items-center justify-center shadow-sm">
               <img id="drawerImageDisplay" src="" alt="Work Photo" class="w-full h-auto max-h-60 object-cover group-hover:scale-105 transition-transform duration-300">
               <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition duration-200">
                 <span class="text-white text-xs font-bold bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-700">🔍 Click to View Fullscreen</span>
@@ -1266,6 +1276,7 @@
       installAndroidContent: document.getElementById('installAndroidContent'),
       installiOSContent: document.getElementById('installiOSContent'),
       androidNativeInstallBtn: document.getElementById('androidNativeInstallBtn'),
+      pwaDirectInstallBtn: document.getElementById('pwaDirectInstallBtn'),
 
       // Navigation Counts Badges
       dashboardCountBadge: document.getElementById('dashboardCountBadge'),
@@ -1365,6 +1376,7 @@
       copyReferenceUrlBtn: document.getElementById('copyReferenceUrlBtn'),
 
       drawerImageContainer: document.getElementById('drawerImageContainer'),
+      drawerImageDisplayWrapper: document.getElementById('drawerImageDisplayWrapper'),
       drawerImageDisplay: document.getElementById('drawerImageDisplay'),
 
       drawerBudget: document.getElementById('drawerBudget'),
@@ -1552,14 +1564,14 @@
     registerMockDropzoneHandler('newWorkDropzone', 'newWorkFileInput', 'newWorkUploadFilename', 'newWorkImageUrl');
     registerMockDropzoneHandler('editWorkDropzone', 'editWorkFileInput', 'editWorkUploadFilename', 'editWorkImageUrl');
 
-    // Custom App Icon Configurator implementation
+    // Custom App Icon Configurator implementation with Install modal preview integration
     const renderCustomBrandIcon = () => {
-      const wrappers = [dom.brandIconWrapper, dom.authLogoWrapper];
-      const displays = [dom.brandIconDisplay];
+      const pwaModalIcon = document.getElementById('pwaModalIconPreview');
+      const wrappers = [dom.brandIconWrapper, dom.authLogoWrapper, pwaModalIcon];
 
       wrappers.forEach(wrap => {
         if (!wrap) return;
-        wrap.className = `w-10 h-10 rounded-xl bg-gradient-to-tr ${state.appIconGradient} flex items-center justify-center shadow-md shadow-indigo-500/10 cursor-pointer overflow-hidden transition-all duration-200 hover:scale-105`;
+        wrap.className = `w-10 h-10 rounded-xl bg-gradient-to-tr ${state.appIconGradient} flex items-center justify-center shadow-md shadow-indigo-500/10 cursor-pointer overflow-hidden transition-all duration-200 hover:scale-105 shrink-0`;
         if (state.appIconCustomDataUrl) {
           wrap.innerHTML = `<img src="${state.appIconCustomDataUrl}" alt="App" class="w-full h-full object-cover">`;
         } else {
@@ -1677,7 +1689,7 @@
       }
     });
 
-    // PWA Support prompt triggers
+    // PWA Support prompt triggers with Direct Installation CTA link integration
     let deferredPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -1685,6 +1697,12 @@
       if (dom.androidNativeInstallBtn) {
         dom.androidNativeInstallBtn.classList.remove('hidden');
       }
+    });
+
+    // Listen for successful installed event
+    window.addEventListener('appinstalled', () => {
+      triggerToast("WorkFlowForge was successfully installed on your device!");
+      deferredPrompt = null;
     });
 
     dom.sidebarInstallBtn.addEventListener('click', () => {
@@ -1712,17 +1730,22 @@
       dom.installAndroidContent.classList.add('hidden');
     });
 
-    dom.androidNativeInstallBtn.addEventListener('click', async () => {
+    const triggerPwaInstallationWorkflow = async () => {
       if (deferredPrompt) {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         if (outcome === 'accepted') {
-          triggerToast("Thank you for installing WorkFlowForge!");
+          triggerToast("PWA Installation Accepted! Loading workflow elements...");
         }
         deferredPrompt = null;
-        dom.androidNativeInstallBtn.classList.add('hidden');
+        if (dom.androidNativeInstallBtn) dom.androidNativeInstallBtn.classList.add('hidden');
+      } else {
+        triggerToast("Direct install is supported on compatible devices! Try your browser options menu and tap 'Add to Home Screen'.", false);
       }
-    });
+    };
+
+    dom.androidNativeInstallBtn.addEventListener('click', triggerPwaInstallationWorkflow);
+    dom.pwaDirectInstallBtn.addEventListener('click', triggerPwaInstallationWorkflow);
 
     // Custom Delete dialog elements
     const confirmDeleteModalWrapper = (description) => {
@@ -3237,6 +3260,18 @@
       });
     }
 
+    // Bind click listener on drawer image preview wrapper to fix Work File Attachment lightbox zoom action
+    if (dom.drawerImageDisplayWrapper) {
+      dom.drawerImageDisplayWrapper.addEventListener('click', () => {
+        if (dom.drawerImageDisplay && dom.drawerImageDisplay.src) {
+          dom.lightboxImage.src = dom.drawerImageDisplay.src;
+          dom.lightboxCaption.textContent = dom.drawerTitle.textContent || 'Work File Attachment';
+          dom.lightboxModal.classList.remove('hidden');
+          dom.lightboxModal.classList.add('flex');
+        }
+      });
+    }
+
     // --- CRUD WORK SPEC CREATION HANDLERS ---
     dom.newWorkForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -3273,7 +3308,7 @@
         return;
       }
 
-      const matchedPipeline = state.workflows.find(w => w.id === matchedPipeline.id) || { stages: ['To Do'] };
+      const matchedPipeline = state.workflows.find(w => w.id === wfId) || { stages: ['To Do'] };
       const initialStage = matchedPipeline.stages[0] || 'To Do';
 
       const workItemData = {
