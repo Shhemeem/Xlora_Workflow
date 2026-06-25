@@ -689,8 +689,9 @@
               </div>
               <h2 id="drawerTitle" class="text-xl font-black text-slate-900 mt-1">Project Spec Title</h2>
               <div id="drawerClientBox" class="text-xs text-slate-500 font-medium"></div>
-              <div id="drawerShopBox" class="text-xs font-bold text-slate-700"></div>
-              <div id="drawerDueDateBox" class="text-xs font-semibold text-rose-600 flex items-center gap-1.5"></div>
+              <div id="drawerShopBox" class="text-xs font-bold text-slate-700 mt-1"></div>
+              <div id="drawerDealerBox" class="text-xs font-bold text-indigo-700 mt-0.5"></div>
+              <div id="drawerDueDateBox" class="text-xs font-semibold text-rose-600 flex items-center gap-1.5 mt-1"></div>
             </div>
             <button id="closeDrawerBtn" class="text-slate-400 hover:text-slate-600 p-1.5 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -845,7 +846,7 @@
           </div>
 
           <!-- Client Details & Shop Metadata Fields -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Name</label>
               <input id="newWorkClientName" type="text" placeholder="e.g. Acme Corp" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
@@ -853,6 +854,10 @@
             <div>
               <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Shop Name</label>
               <input id="newWorkShopName" type="text" placeholder="e.g. Acme Design Studio" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Project Dealer Name</label>
+              <input id="newWorkDealerName" type="text" placeholder="e.g. John Enterprises" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
             </div>
             <div>
               <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Contact (Email)</label>
@@ -971,7 +976,7 @@
           </div>
 
           <!-- Client Details & Shop Metadata Fields -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Name</label>
               <input id="editWorkClientName" type="text" placeholder="e.g. Acme Corp" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
@@ -979,6 +984,10 @@
             <div>
               <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Shop Name</label>
               <input id="editWorkShopName" type="text" placeholder="e.g. Acme Design Studio" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Project Dealer Name</label>
+              <input id="editWorkDealerName" type="text" placeholder="e.g. John Enterprises" class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 rounded-xl text-xs py-2.5 px-3.5 text-slate-800 outline-none transition" />
             </div>
             <div>
               <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Client Contact (Email)</label>
@@ -1325,6 +1334,7 @@
 
       // New metadata inputs
       newWorkShopName: document.getElementById('newWorkShopName'),
+      newWorkDealerName: document.getElementById('newWorkDealerName'),
       newWorkDueDate: document.getElementById('newWorkDueDate'),
       newWorkDropzone: document.getElementById('newWorkDropzone'),
       newWorkFileInput: document.getElementById('newWorkFileInput'),
@@ -1335,6 +1345,7 @@
       editWorkModal: document.getElementById('editWorkModal'),
       editWorkForm: document.getElementById('editWorkForm'),
       editWorkShopName: document.getElementById('editWorkShopName'),
+      editWorkDealerName: document.getElementById('editWorkDealerName'),
       editWorkDueDate: document.getElementById('editWorkDueDate'),
       editWorkDropzone: document.getElementById('editWorkDropzone'),
       editWorkFileInput: document.getElementById('editWorkFileInput'),
@@ -1349,6 +1360,7 @@
       drawerTitle: document.getElementById('drawerTitle'),
       drawerClientBox: document.getElementById('drawerClientBox'),
       drawerShopBox: document.getElementById('drawerShopBox'),
+      drawerDealerBox: document.getElementById('drawerDealerBox'),
       drawerDueDateBox: document.getElementById('drawerDueDateBox'),
       drawerDescDisplay: document.getElementById('drawerDescDisplay'),
       drawerStepperContainer: document.getElementById('drawerStepperContainer'),
@@ -2331,7 +2343,7 @@
           const budgetText = formatCurrency(work.totalBudget || 0);
           const paidText = formatCurrency(work.amountPaid || 0);
 
-          const clientMarkup = work.clientName ? `<p class="text-[10px] text-slate-500 font-medium">Client: ${work.clientName} ${work.shopName ? `(${work.shopName})` : ''}</p>` : '';
+          const clientMarkup = work.clientName ? `<p class="text-[10px] text-slate-500 font-medium truncate">Client: ${work.clientName} ${work.shopName ? `(${work.shopName})` : ''} ${work.dealerName ? `| Dealer: ${work.dealerName}` : ''}</p>` : '';
           
           const previewImageBadge = work.imageUrl ? `
             <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 shrink-0 bg-slate-50 cursor-zoom-in group-hover:ring-2 group-hover:ring-indigo-500 transition-all duration-150 lightbox-trigger-btn" data-url="${work.imageUrl}" data-title="${work.title}">
@@ -2513,7 +2525,8 @@
                               (work.description && work.description.toLowerCase().includes(searchQueryVal)) ||
                               (work.category && work.category.toLowerCase().includes(searchQueryVal)) ||
                               (work.clientName && work.clientName.toLowerCase().includes(searchQueryVal)) ||
-                              (work.shopName && work.shopName.toLowerCase().includes(searchQueryVal));
+                              (work.shopName && work.shopName.toLowerCase().includes(searchQueryVal)) ||
+                              (work.dealerName && work.dealerName.toLowerCase().includes(searchQueryVal));
         const matchesCategory = categoryFilterVal === 'All' || work.category === categoryFilterVal;
         const matchesPriority = priorityFilterVal === 'All' || work.priority === priorityFilterVal;
 
@@ -2571,6 +2584,12 @@
               <div class="flex justify-between items-center">
                 <span class="font-medium text-slate-400 text-[9px]">Shop storefront:</span>
                 <span class="font-semibold text-slate-500 text-[9px] truncate max-w-[120px]">${work.shopName}</span>
+              </div>
+            ` : ''}
+            ${work.dealerName ? `
+              <div class="flex justify-between items-center mt-0.5">
+                <span class="font-medium text-slate-400 text-[9px]">Dealer:</span>
+                <span class="font-semibold text-slate-500 text-[9px] truncate max-w-[120px]">${work.dealerName}</span>
               </div>
             ` : ''}
           </div>
@@ -2768,7 +2787,7 @@
                 const doneTasksLength = work.tasks ? work.tasks.filter(t => t.done).length : 0;
                 const budgetText = formatCurrency(work.totalBudget || 0);
 
-                const clientMarkup = work.clientName ? `<p class="text-[9px] text-slate-500 italic truncate mb-1">Client: ${work.clientName}</p>` : '';
+                const clientMarkup = work.clientName ? `<p class="text-[9px] text-slate-500 italic truncate mb-1">Client: ${work.clientName} ${work.dealerName ? `| Dealer: ${work.dealerName}` : ''}</p>` : '';
                 const completionBadge = isFinalStage ? `
                   <span class="absolute top-3 right-3 flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-sm animate-bounce" title="Project Complete">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
@@ -3064,7 +3083,7 @@
       if (work.clientName) {
         const emailInfo = work.clientContact ? ` &bull; ${work.clientContact}` : '';
         dom.drawerClientBox.innerHTML = `
-          <div class="flex items-center gap-1.5 bg-slate-100/60 p-2.5 rounded-xl border border-slate-200 mt-1">
+          <div class="flex items-center gap-1.5 bg-slate-100/60 p-2.5 rounded-xl border border-slate-200 mt-1 flex-wrap">
             <span class="text-slate-400 font-bold text-[9px] uppercase tracking-wider">Client:</span>
             <span class="font-bold text-slate-800 text-xs">${work.clientName}</span>
             <span class="text-slate-500 text-xs">${emailInfo}</span>
@@ -3079,6 +3098,14 @@
         dom.drawerShopBox.classList.remove('hidden');
       } else {
         dom.drawerShopBox.classList.add('hidden');
+      }
+
+      // Render Dealer box dynamically
+      if (work.dealerName) {
+        dom.drawerDealerBox.textContent = `🤝 Dealer: ${work.dealerName}`;
+        dom.drawerDealerBox.classList.remove('hidden');
+      } else {
+        dom.drawerDealerBox.classList.add('hidden');
       }
 
       if (work.dueDate) {
@@ -3356,6 +3383,7 @@
       document.getElementById('editWorkDesc').value = work.description || '';
       document.getElementById('editWorkClientName').value = work.clientName || '';
       document.getElementById('editWorkShopName').value = work.shopName || '';
+      document.getElementById('editWorkDealerName').value = work.dealerName || '';
       document.getElementById('editWorkClientContact').value = work.clientContact || '';
       document.getElementById('editWorkCategory').value = work.category || '';
       document.getElementById('editWorkPriority').value = work.priority || 'Medium';
@@ -3428,6 +3456,7 @@
       const desc = document.getElementById('newWorkDesc').value.trim();
       const clientName = document.getElementById('newWorkClientName').value.trim();
       const shopName = dom.newWorkShopName.value.trim();
+      const dealerName = document.getElementById('newWorkDealerName').value.trim();
       const clientContact = document.getElementById('newWorkClientContact').value.trim();
       const cat = document.getElementById('newWorkCategory').value.trim() || 'General';
       const priority = document.getElementById('newWorkPriority').value;
@@ -3463,6 +3492,7 @@
         description: desc,
         clientName: clientName,
         shopName: shopName,
+        dealerName: dealerName,
         clientContact: clientContact,
         category: cat,
         priority: priority,
@@ -3506,6 +3536,7 @@
       const desc = document.getElementById('editWorkDesc').value.trim();
       const clientName = document.getElementById('editWorkClientName').value.trim();
       const shopName = dom.editWorkShopName.value.trim();
+      const dealerName = document.getElementById('editWorkDealerName').value.trim();
       const clientContact = document.getElementById('editWorkClientContact').value.trim();
       const cat = document.getElementById('editWorkCategory').value.trim() || 'General';
       const priority = document.getElementById('editWorkPriority').value;
@@ -3536,6 +3567,7 @@
         description: desc,
         clientName: clientName,
         shopName: shopName,
+        dealerName: dealerName,
         clientContact: clientContact,
         category: cat,
         priority: priority,
